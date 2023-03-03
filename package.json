@@ -16,6 +16,8 @@
   "author": "Arpit Nakarani",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/abort-controller": "^3.272.0",
+    "@aws-sdk/client-s3": "^3.282.0",
     "@types/body-parser": "^1.19.2",
     "@types/config": "^0.0.41",
     "@types/cors": "^2.8.12",

@@ -14,6 +14,7 @@ const userSchema: any = new mongoose.Schema({
     otpExpireTime: { type: Date, default: null },
     isEmailVerified: { type: Boolean, default: false },
    
+    userType : { type : String , default :"user"}, //faculty , admin , user
     isActive: { type: Boolean, default: true },
     isBlock: { type: Boolean, default: false },
     isLoggedIn : { type : Boolean , default : false},
