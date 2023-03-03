@@ -16,7 +16,7 @@ let logColor: any = {
         debug: "cyan"
     }
 },
-    name: String = "Q&A"
+    name: String = "Satdham"
 winston.addColors(logColor)
 
 let alignColorsAndTime = winston.format.combine(

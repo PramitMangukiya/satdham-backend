@@ -1,7 +1,10 @@
 const mongoose = require('mongoose')
 
 const userSchema: any = new mongoose.Schema({
-    name : {type  : String},
+    firstName : {type  : String},
+    lastName : { type : String},
+    middleName :  {type : String},
+
     email: { type: String, required: true },
     phoneNumber: { type: String},
     password: { type: String },
@@ -13,7 +16,7 @@ const userSchema: any = new mongoose.Schema({
    
     isActive: { type: Boolean, default: true },
     isBlock: { type: Boolean, default: false },
-    isLoggedIn : { type : Boolean , defailt : false},
+    isLoggedIn : { type : Boolean , default : false},
 
 }, { timestamps: true })
 
