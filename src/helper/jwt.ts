@@ -4,8 +4,9 @@ import mongoose from 'mongoose'
 import {  apiResponse, userStatus } from '../common'
 import { Request, response, Response } from 'express'
 import { responseMessage } from './response'
+import { userModel } from '../database'
 
-const ObjectId = mongoose.Types.ObjectId
+const ObjectId: any = mongoose.Types.ObjectId
 const jwt_token_secret = process.env.JWT_TOKEN_SECRET;
 
 export const userJWT = async (req: Request, res: Response, next) => {
@@ -39,5 +40,31 @@ export const userJWT = async (req: Request, res: Response, next) => {
         }
     } else {
         return res.status(401).json(new apiResponse(401, responseMessage?.tokenNotFound, {}, {}))
+    }
+}
+
+
+export const adminJWT = async (req: Request, res: Response, next) => {
+    let { authorization, userType } = req.headers,
+        result: any
+    if (authorization) {
+        try {
+            let isVerifyToken = jwt.verify(authorization, jwt_token_secret)
+            result = await userModel.findOne({ _id: ObjectId(isVerifyToken?._id), isActive: true , userType : "admin" })
+            if (result?.isBlock == true) return res.status(403).json(new apiResponse(403, 'Your account han been blocked.', {}, {}));
+            if (result?.isActive == true && isVerifyToken.authToken == result.authToken && isVerifyToken.type == result.userType) {
+                // Set in Header Decode Token Information
+                req.headers.user = result
+                return next()
+            } else {
+                return res.status(401).json(new apiResponse(401, "Invalid-Token", {}, {}))
+            }
+        } catch (err) {
+            if (err.message == "invalid signature") return res.status(403).json(new apiResponse(403, `Don't try different one token`, {}, {}))
+            console.log(err)
+            return res.status(401).json(new apiResponse(401, "Invalid Token", {}, {}))
+        }
+    } else {
+        return res.status(401).json(new apiResponse(401, "Token not found in header", {}, {}))
     }
 }

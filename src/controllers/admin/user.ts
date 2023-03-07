@@ -11,9 +11,12 @@ export const add_user = async (req: Request, res: Response) => {
     let body = req.body, //{question , options , ans }
         {user} : any = req.headers;
     try {
-        body.createdBy = ObjectId(user._id);
         //assign userId and password
         let userId : any = null , password :any ;
+        //if in one class same roll no is present then ?
+        const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
+        if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+
         while(!userId){
             let temp = generateUserId();
            const copy =  await userModel.findOne({userId : temp , isActive : true ,userType : "user"});
@@ -21,12 +24,14 @@ export const add_user = async (req: Request, res: Response) => {
         }
         body.userId = userId;
         body.password = generatePassword();
-        
+        body.standard = ObjectId(body.standard);
+
         const response = await new userModel(body).save();
         if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("user") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
 
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -35,11 +40,33 @@ export const edit_user_by_id = async(req,res) =>
 {
     reqInfo(req)
     let { user } = req.headers,
-        body = req.body //{id , changeField}
+        body = req.body; //if roll number then must send class
     try {
-        const response = await userModel.findOneAndUpdate({_id :ObjectId(body.id) , isActive : true} , body , {new : true})
+        const data = await userModel.findOne({_id :ObjectId(body?._id) , isActive : true});
+        if(body.rollNo) {
+            let isExist = await userModel.findOne({isActive : true , 
+                                                      rollNo : body.rollNo ,
+                                                      class : data.class ,
+                                                      userType : "user" ,
+                                                       _id : {$ne : ObjectId(user?._id)} 
+                                                    } , {new : true})
+
+            console.log(isExist);
+            if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+        }
+        if(body.siblings.length > 0)
+        {
+            for(let i = 0 ; i < body.siblings.length ; i ++){
+                    let item = body.siblings[i];
+                    item._id = ObjectId(item._id);
+            }
+        }
+        console.log(body.siblings , "siblings");
+        
+        const response = await userModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
         return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("user"), response, {}));
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -63,15 +90,15 @@ export const get_all_user = async (req, res) => {
     reqInfo(req)
     let response: any, { page, limit, search , userFilter} = req.body, match: any = {};
     try {
-        if (search) {
+        if (search){
             var userArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                userArray.push({ userLine: { $regex: data, $options: 'si' } })
+                userArray.push({ firstName: { $regex: data, $options: 'si' } })
             })
             match.$or = [{ $and: userArray }]
         }
-        if(userFilter) match.subjectId = ObjectId(userFilter);
+        // if(userFilter) match.subjectId = ObjectId(userFilter);
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
         response = await userModel.aggregate([
