@@ -29,6 +29,12 @@ router.delete("/enquiry/delete/:id" , adminController.delete_enquiry_by_id);
 router.post("/enquiry/get/all" , adminController.get_all_enquiry);
 router.get("/enquiry/:id" , adminController.get_by_id_enquiry);
 
+//------------------------ standard -----------------------------------------
+router.post("/standard/add" , adminController.add_standard);
+router.patch("/standard/edit" , adminController.edit_standard_by_id);
+router.delete("/standard/delete/:id" , adminController.delete_standard_by_id);
+router.post("/standard/get/all" , adminController.get_all_standard);
+router.get("/standard/:id" , adminController.get_by_id_standard);
 
 
 

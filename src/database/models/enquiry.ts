@@ -15,12 +15,11 @@ const enquirySchema: any = new mongoose.Schema({
     lastYearPercentage :  {type : String},
     referenceStudent : {type : String},
 
-
     //faculty
     subject : { type : String},
     preSchool : {type : String},
     experience : {type : String},
-    salary : {type : String},
+    salary : {type : Number},
     isActive : {type : Boolean , default : true}
 
 }, { timestamps: true })
