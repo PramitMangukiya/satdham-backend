@@ -110,12 +110,16 @@ export const get_all_user = async (req, res) => {
     let response: any, { page, limit, search , userTypeFilter} = req.body, match: any = {};
     try {
         if (search){
-            var userArray: Array<any> = []
+            var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
+                userIdArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                userArray.push({ firstName: { $regex: data, $options: 'si' } })
+                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } })
+                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } })
+                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } })
+                userIdArray.push({ userId: { $regex: data, $options: 'si' } })
             })
-            match.$or = [{ $and: userArray }]
+            match.$or = [{ $and: firstNameArray }]
         }
         if(userTypeFilter) match.userType = userTypeFilter;
         // if(blockFilter) match.isBlock = blockFilter;

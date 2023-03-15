@@ -43,10 +43,16 @@ router.post("/attendance/add" , adminController.add_edit_attendance);
 router.post("/attendance/get" , adminController.get_attendance_by_date_std_subject);
 // router.get("/attendance/:id" , adminController.get_by_id_attendance);
 
+//------------------------ Grouphead -----------------------------------------
+router.post("/grouphead/add" , adminController.add_groupHead);
+router.patch("/grouphead/edit" , adminController.edit_groupHead_by_id);
+router.delete("/grouphead/delete/:id" , adminController.delete_groupHead_by_id);
+router.post("/grouphead/get/all" , adminController.get_all_groupHead);
+router.get("/grouphead/:id" , adminController.get_by_id_groupHead);
 
 
 
 
-// router.use(adminJWT);
+
 
 export const adminRouter = router
