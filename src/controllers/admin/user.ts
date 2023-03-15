@@ -9,21 +9,32 @@ const ObjectId = require('mongoose').Types.ObjectId
 export const add_user = async (req: Request, res: Response) => {
     reqInfo(req);
     let body = req.body, //{question , options , ans }
-        {user} : any = req.headers;
+        {user} : any = req.headers,
+        prefix ; //prefix for user U and for faculty F
     try {
         //assign userId and password
         let userId : any = null , password :any ;
         //if in one class same roll no is present then ?
-        const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
-        if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+        if((!body?.userType) || body.userType != "faculty")
+        {
+            prefix = "U"; //setted prefix as a user
+            const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
+            if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+        }
+        if(body.userType == "faculty"){
+            prefix = "F"; //setted prefix as a user
+            const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,userType : "faculty" , })
+            if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Phone number") , {} , {}));
+        }
 
         while(!userId){
-            let temp = generateUserId();
+            
+            let temp = generateUserId(prefix);
            const copy =  await userModel.findOne({userId : temp , isActive : true ,userType : "user"});
            if(!copy) userId = temp;
         }
         body.userId = userId;
-        body.password = generatePassword();
+        if(!body.password) body.password = generatePassword();
         body.standard = ObjectId(body.standard);
 
         const response = await new userModel(body).save();
@@ -43,26 +54,34 @@ export const edit_user_by_id = async(req,res) =>
         body = req.body; //if roll number then must send class
     try {
         const data = await userModel.findOne({_id :ObjectId(body?._id) , isActive : true});
-        if(body.rollNo) {
-            let isExist = await userModel.findOne({isActive : true , 
-                                                      rollNo : body.rollNo ,
-                                                      class : data.class ,
-                                                      userType : "user" ,
-                                                       _id : {$ne : ObjectId(user?._id)} 
-                                                    } , {new : true})
-
-            console.log(isExist);
-            if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
-        }
-        if(body.siblings.length > 0)
+        if(data.userType == "user")
         {
-            for(let i = 0 ; i < body.siblings.length ; i ++){
-                    let item = body.siblings[i];
-                    item._id = ObjectId(item._id);
+            if(body?.rollNo) {
+                let isExist = await userModel.findOne({isActive : true , 
+                                                          rollNo : body.rollNo ,
+                                                          class : data.class ,
+                                                          userType : "user" ,
+                                                           _id : {$ne : ObjectId(user?._id)} 
+                                                        },{new : true})
+    
+                console.log(isExist);
+                if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
             }
+            if(body?.siblings?.length > 0)
+            {
+                for(let i = 0 ; i < body.siblings.length ; i ++){
+                        let item = body.siblings[i];
+                        item._id = ObjectId(item._id);
+                }
+            }
+            console.log(body?.siblings , "siblings");
         }
-        console.log(body.siblings , "siblings");
-        
+
+        if(data.userType == "faculty"){
+            const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,userType : "faculty"  })
+            if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Phone number") , {} , {}));
+        }
+      
         const response = await userModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
         return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("user"), response, {}));
     } catch (error) {
@@ -88,7 +107,7 @@ export const delete_user_by_id = async(req,res) =>
 
 export const get_all_user = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , userFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , userTypeFilter} = req.body, match: any = {};
     try {
         if (search){
             var userArray: Array<any> = []
@@ -98,7 +117,7 @@ export const get_all_user = async (req, res) => {
             })
             match.$or = [{ $and: userArray }]
         }
-        // if(userFilter) match.subjectId = ObjectId(userFilter);
+        if(userTypeFilter) match.userType = userTypeFilter;
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
         response = await userModel.aggregate([

@@ -18,9 +18,9 @@ export const userStatus = {
     upload: "upload"
 }
 
-export const generateUserId = ()=> {
+export const generateUserId = (prefix)=> {
     const randomInt = Math.floor(Math.random() * 100000); // Generate a random integer between 0 and 99999
-    const userId = `U${randomInt.toString().padStart(5, '0')}`; // Combine the random integer with the prefix "u-" and pad with leading zeros
+    const userId = `${prefix}${randomInt.toString().padStart(5, '0')}`; // Combine the random integer with the prefix "u-" and pad with leading zeros
     return userId;
   }
 
@@ -33,3 +33,9 @@ export const generateUserId = ()=> {
     }
     return password;
   }
+
+  export const   get_next_Date = (date , day) =>{
+    const nextDate  = new Date(date); // The Date object returns today's timestamp
+    nextDate.setDate(nextDate.getDate() + day);
+    return nextDate;
+}

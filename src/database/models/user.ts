@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 
 const userSchema: any = new mongoose.Schema({
+
+  //----------------------------- User details -------------------------------
     //personal details
     firstName : {type  : String},
     lastName : { type : String},
@@ -20,7 +22,7 @@ const userSchema: any = new mongoose.Schema({
     bloodGroup : {type :  String},
     preSchool: {type : String},
 
-    email: { type: String, required: true },
+    email: { type: String },
     phoneNumber: { type: String},
     userId : {type : String},
     password: { type: String },
@@ -50,10 +52,16 @@ const userSchema: any = new mongoose.Schema({
         } 
     ],
 
+    //------------------- Faculty Details--------------------------------------------------
+    experience : {type : Number},
+    salary : {type :Number},
+    subject : {type : String},
+    reference :  {type :String},
+    joiningDate : {type : Date},
 
 
     
-   
+   //------------------- General Fields ---------------------------------------------------
     otp: { type: Number, default: null },
     otpExpireTime: { type: Date, default: null },
     isEmailVerified: { type: Boolean, default: false },

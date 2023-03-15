@@ -36,6 +36,12 @@ router.delete("/standard/delete/:id" , adminController.delete_standard_by_id);
 router.post("/standard/get/all" , adminController.get_all_standard);
 router.get("/standard/:id" , adminController.get_by_id_standard);
 
+//------------------------ attendance -----------------------------------------
+router.post("/attendance/add" , adminController.add_edit_attendance);
+// router.patch("/attendance/edit" , adminController.edit_attendance_by_id);
+// router.delete("/attendance/delete/:id" , adminController.delete_attendance_by_id);
+router.post("/attendance/get" , adminController.get_attendance_by_date_std_subject);
+// router.get("/attendance/:id" , adminController.get_by_id_attendance);
 
 
 
