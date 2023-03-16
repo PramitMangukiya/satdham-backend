@@ -37,6 +37,7 @@ export const add_user = async (req: Request, res: Response) => {
         if(!body.password) body.password = generatePassword();
         body.standard = ObjectId(body.standard);
 
+        //(penindg)standard pramane fees attach karvani
         const response = await new userModel(body).save();
         if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("user") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
@@ -76,6 +77,9 @@ export const edit_user_by_id = async(req,res) =>
             }
             console.log(body?.siblings , "siblings");
         }
+
+
+        //(pending)standard change then new  pending fees attach karvani
 
         if(data.userType == "faculty"){
             const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,userType : "faculty"  })
