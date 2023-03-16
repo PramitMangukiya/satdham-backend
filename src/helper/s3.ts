@@ -16,14 +16,14 @@ const s3 = new AWS.S3({
 const bucket_name = process.env.BUCKET_NAME
 const bucket_url = process.env.BUCKET_URL
 
-export const deleteImage = async function (file: any, folder: any) {
+export const deleteImage = async function (file: any, folder: any , type : any , name : any) {
     return new Promise(async function (resolve, reject) {
         try {
-            const bucketPath = `${bucket_name}/${folder}`
-
+            const bucketPath = `${bucket_name}/${folder}/${type}/${file}`
+            // console.log(bucketPath , "bucketPath");
             let params = {
                 Bucket: bucketPath,
-                Key: file
+                Key: name
             }
             await s3.deleteObject(params, function (err, data) {
                 if (err) {
@@ -53,10 +53,10 @@ export const uploadS3 = multer({
         key: function (req: any, file, cb) {
             logger.info('file successfully upload')
             const file_type = file.originalname.split('.')
-            req.body.location = `${bucket_url}/${req.header('user')?._id}/${req.params.file}/${Date.now().toString()}.${file_type[file_type.length - 1]}`
+            req.body.location = `${bucket_url}/${req.header('user')?._id}/${req.params.file}/${Date.now().toString()}/${file_type[0]}.${file_type[file_type.length - 1]}`
             cb(
                 null,
-                `${req.header('user')?._id}/${req.params.file}/${Date.now().toString()}.${file_type[file_type.length - 1]}`
+                `${req.header('user')?._id}/${req.params.file}/${Date.now().toString()}/${file_type[0]}.${file_type[file_type.length - 1]}`
             );
         },
     }),
@@ -127,75 +127,34 @@ export const uploadS3_contributor = multer({
     }),
 });
 
-// export const file_upload_response = async (req: Request, res: Response) => {
-//     reqInfo(req)
-//     try {
-//         let file: any = req.file
-//         return res.status(200).json({
-//             status: 200,
-//             message: "Image successfully uploaded",
-//             // data: { image: file?.location }
-//             data: { image: req.body.location }
-//         })
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json(await apiResponse(500, 'Internal server error in reset-password', {}, error));
-//     }
-// }
 
-// export const image_compress_response = async (req: Request, res: Response) => {
-//     reqInfo(req)
-//     try {
-//         let file: any = req.file
-//         return res.status(200).json({
-//             status: 200,
-//             message: "Image successfully uploaded",
-//             // data: { image: file?.transforms[0]?.location }
-//             data: { image: req.body.location }
-//         })
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json(await apiResponse(500, 'Internal Server Error', {}, error));
-//     }
-// }
+export const image_compress_response = async (req, res) => {
+    reqInfo(req)
+    try {
+        let file: any = req.file;
+        return res.status(200).json({
+            status: 200,
+            message: "Image successfully uploaded",
+            // data: { image: file?.transforms[0]?.location }
+            data: { image: req.body.location }
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(new apiResponse(500, 'Internal Server Error', {}, error));
+    }
+}
 
 export const delete_file = async (req: Request, res: Response) => {
     reqInfo(req)
-    let { file, folder } = req.params
+    let { folder ,type , file , name} = req.params
     try {
-        let message = await deleteImage(file, folder)
+        console.log(req.params , "request params");
+        // console.log("data" , file , "folder" , folder , "type" , type);
+        let message = await deleteImage(file, folder , type , name);
         return res.status(200).json(new apiResponse(200, `${message}`, {}, {}))
-
     } catch (error) {
         console.log(error)
         return res.status(500).json(new apiResponse(500, 'Internal Server Error ', {}, error));
     }
 }
 
-export const upload_all_type = async function (image, bucketPath) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            // image.data = await compressImage(image)
-            var params = {
-                Bucket: `${bucket_name}/${bucketPath}`,
-                Key: image.name,
-                Body: image.data,
-                ContentType: image.mimetype,
-                ACL: "public-read"
-            };
-            logger.debug("Uploading S3")
-            s3.upload(params, function (err, data) {
-                if (err) {
-                    console.log(err);
-                    reject()
-                } else {
-                    logger.debug("Successfully uploaded data ");
-                    resolve(data.Location)
-                }
-            });
-        } catch (error) {
-            console.log(error);
-            reject()
-        }
-    })
-}

@@ -18,6 +18,9 @@ export const userStatus = {
     upload: "upload"
 }
 
+export const file_path = ['profile', 'document']
+
+
 export const generateUserId = (prefix)=> {
     const randomInt = Math.floor(Math.random() * 100000); // Generate a random integer between 0 and 99999
     const userId = `${prefix}${randomInt.toString().padStart(5, '0')}`; // Combine the random integer with the prefix "u-" and pad with leading zeros
@@ -39,3 +42,4 @@ export const generateUserId = (prefix)=> {
     nextDate.setDate(nextDate.getDate() + day);
     return nextDate;
 }
+
