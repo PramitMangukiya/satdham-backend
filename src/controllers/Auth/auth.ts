@@ -212,22 +212,22 @@ export const resend_otp = async (req: Request, res: Response) => {
                     flag++;
                 }
             }
-            let isAlreadyAssign = await userModel.findOne({ otp: otp });
+            let isAlreadyAssign = await userModel.findOne({ otp: otp, userType : "admin" });
             if (isAlreadyAssign?.otp != otp) otpFlag = 0;
         }
-        const response = await userModel.findOneAndUpdate({ phoneNumber: body?.phoneNumber, isActive: true }, { otp: otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) });
+        const response = await userModel.findOneAndUpdate({ email: body?.email, isActive: true , userType : "admin" , otp : {$ne : null}}, { otp: otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) });
         if (!response) 
          return res.status(404).json(new apiResponse(404, "Unable to send otp!", null, {}))
         //user saved succesfully now send otp to the user
-        let result: any = await email_verification_mail(response, otp);
+        let result: any = await forgot_password_mail(response, otp);
 
         if (!result) {
             //tap on resend otp
-            await userModel.findOneAndUpdate({  phoneNumber: body?.phoneNumber , isActive : true }, { otp: null, otpExpireTime: null });
+            await userModel.findOneAndUpdate({  email: body?.email , isActive : true , userType : "admin"  }, { otp: null, otpExpireTime: null });
             return res.status(501).json(new apiResponse(501, "Error in sending otp from server tap on resend otp", {}, {}));
         }
         //otp sended
-        return res.status(200).json(new apiResponse(200, "otp-sended succesfully", {}, {}));
+        return res.status(200).json(new apiResponse(200, `otp is - ${otp} - ${result}`, {}, {}));
     }
     catch (error) {
         console.log("error", error);

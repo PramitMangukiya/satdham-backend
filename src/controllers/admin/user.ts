@@ -133,6 +133,8 @@ export const get_all_user = async (req, res) => {
         if(userTypeFilter) match.userType = userTypeFilter;
         if(pendingFeesFilter)match.pendingFees = {$gt : 0};
 
+        console.log(match);
+
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
         response = await userModel.aggregate([
