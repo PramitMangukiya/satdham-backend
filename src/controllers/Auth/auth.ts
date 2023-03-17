@@ -167,7 +167,7 @@ export const forgot_password = async (req: Request, res: Response) => {
             await userModel.findOneAndUpdate(body, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) })
             return res.status(200).json(new apiResponse(200, `${response}`, {}, {}));
         }
-        else return res.status(501).json(new apiResponse(501, responseMessage?.errorMail, {}, `${response}`));
+        else return res.status(501).json(new apiResponse(501, responseMessage?.errorMail, {}, `otp is : ${otp} - ${response}`));
     } catch (error) {
         return res
             .status(500)

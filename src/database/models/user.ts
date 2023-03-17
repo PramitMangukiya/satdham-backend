@@ -52,6 +52,11 @@ const userSchema: any = new mongoose.Schema({
         } 
     ],
 
+    //fees
+    totalFees :{type : Number },
+    pendingFees : { type : Number},
+
+
     //------------------- Faculty Details--------------------------------------------------
     experience : {type : Number},
     salary : {type :Number},

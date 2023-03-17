@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { apiResponse, generatePassword, generateUserId } from "../../common";
-import { userModel } from "../../database";
+import { standardModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 
 const ObjectId = require('mongoose').Types.ObjectId
@@ -37,7 +37,10 @@ export const add_user = async (req: Request, res: Response) => {
         if(!body.password) body.password = generatePassword();
         body.standard = ObjectId(body.standard);
 
-        //(penindg)standard pramane fees attach karvani
+        //(penindg)standard pramane fees attach karvani - done
+        const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
+        body.totalFees = standard.fees;
+        body.pendingFees = standard.fees;
         const response = await new userModel(body).save();
         if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("user") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
@@ -78,9 +81,8 @@ export const edit_user_by_id = async(req,res) =>
             console.log(body?.siblings , "siblings");
         }
 
-
         //(pending)standard change then new  pending fees attach karvani
-
+    
         if(data.userType == "faculty"){
             const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,userType : "faculty"  })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Phone number") , {} , {}));
@@ -114,11 +116,11 @@ export const delete_user_by_id = async(req,res) =>
 
 export const get_all_user = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , userTypeFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , userTypeFilter , pendingFeesFilter} = req.body, match: any = {};
     try {
         if (search){
             var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
-                userIdArray: Array<any> = []
+            userIdArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
                 firstNameArray.push({ firstName: { $regex: data, $options: 'si' } })
@@ -129,6 +131,8 @@ export const get_all_user = async (req, res) => {
             match.$or = [{ $and: firstNameArray }]
         }
         if(userTypeFilter) match.userType = userTypeFilter;
+        if(pendingFeesFilter)match.pendingFees = {$gt : 0};
+
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
         response = await userModel.aggregate([
