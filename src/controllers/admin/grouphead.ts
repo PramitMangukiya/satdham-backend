@@ -30,6 +30,8 @@ export const edit_groupHead_by_id = async(req,res) =>
         body = req.body; 
     try {
         const response = await groupHeadModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
+        if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("groupHead") , {} , {}));
+
         return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("groupHead"), response, {}));
     } catch (error) {
         console.log(error);
@@ -45,6 +47,7 @@ export const delete_groupHead_by_id = async(req,res) =>
         {id} = req.params
     try {
         const response = await groupHeadModel.findOneAndUpdate({_id :ObjectId(id) , isActive : true} , {isActive : false} , {new : true})
+        if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("groupHead"), {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage.deleteDataSuccess("groupHead"), {}, {}));
     } catch (error) {
         console.log(error);

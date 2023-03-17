@@ -1,19 +1,19 @@
 import { Request, Response } from "express";
 import { apiResponse } from "../../common";
-import { enquiryModel } from "../../database";
+import { canteenModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 
 const ObjectId = require('mongoose').Types.ObjectId
 
 
-export const add_enquiry = async (req: Request, res: Response) => {
+export const add_canteen = async (req: Request, res: Response) => {
     reqInfo(req);
     let body = req.body, //{question , options , ans }
         {user} : any = req.headers;
     try {
-        //assign enquiryId and password
-        const response = await new enquiryModel(body).save();
-        if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("enquiry") , response , {}));
+        //assign canteenId and password
+        const response = await new canteenModel(body).save();
+        if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("canteen") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
 
     } catch (error) {
@@ -22,55 +22,53 @@ export const add_enquiry = async (req: Request, res: Response) => {
     }
 }
 
-export const edit_enquiry_by_id = async(req,res) =>
+export const edit_canteen_by_id = async(req,res) =>
 {
     reqInfo(req)
-    let { enquiry } = req.headers,
+    let { canteen } = req.headers,
         body = req.body; 
     try {
-        const response = await enquiryModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
-        if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("enquiry") , {} , {}));
-
-        return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("enquiry"), response, {}));
+        const response = await canteenModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
+        if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("canteen") , {} , {}));
+        return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("canteen"), response, {}));
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
 
-export const delete_enquiry_by_id = async(req,res) =>
+export const delete_canteen_by_id = async(req,res) =>
 {
     reqInfo(req)
-    let { enquiry } = req.headers,
+    let { canteen } = req.headers,
         body = req.body,
         {id} = req.params
     try {
-       
-         const response = await enquiryModel.findOneAndUpdate({_id :ObjectId(id) , isActive : true} , {isActive : false} , {new : true})
-         if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("enquiry"), {}, {}));
-        return res.status(200).json(new apiResponse(200, responseMessage.deleteDataSuccess("enquiry"), {}, {}));
+        const response = await canteenModel.findOneAndUpdate({_id :ObjectId(id) , isActive : true} , {isActive : false} , {new : true})
+        if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("canteen"), {}, {}));
+        return res.status(200).json(new apiResponse(200, responseMessage.deleteDataSuccess("canteen"), {}, {}));
     } catch (error) {
         console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
 
-export const get_all_enquiry = async (req, res) => {
+export const get_all_canteen = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , enquiryFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , canteenFilter} = req.body, match: any = {};
     try {
         if (search){
-            var enquiryArray: Array<any> = []
+            var canteenArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                enquiryArray.push({ name: { $regex: data, $options: 'si' } })
+                canteenArray.push({ name: { $regex: data, $options: 'si' } })
             })
-            match.$or = [{ $and: enquiryArray }]
+            match.$or = [{ $and: canteenArray }]
         }
-        // if(enquiryFilter) match.subjectId = ObjectId(enquiryFilter);
+        // if(canteenFilter) match.subjectId = ObjectId(canteenFilter);
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
-        response = await enquiryModel.aggregate([
+        response = await canteenModel.aggregate([
             { $match: match },
             {
                 $facet: {
@@ -83,8 +81,8 @@ export const get_all_enquiry = async (req, res) => {
                 }
             },
         ])
-        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess('enquiry'), {
-            enquiry_data: response[0].data,
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess('canteen'), {
+            canteen_data: response[0].data,
             state: {
                 page: page as number,
                 limit: limit as number,
@@ -96,17 +94,17 @@ export const get_all_enquiry = async (req, res) => {
     }
 }
 
-export const get_by_id_enquiry = async(req,res)=>
+export const get_by_id_canteen = async(req,res)=>
 {
         reqInfo(req);
-        let { enquiry } = req.headers,
+        let { canteen } = req.headers,
             body = req.body,
           { id } = req.params;
         try {
-            const response = await enquiryModel.findOne({ _id : ObjectId(id) , isActive : true});
-            if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("enquiry"), {}, {}));
+            const response = await canteenModel.findOne({ _id : ObjectId(id) , isActive : true});
+            if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("canteen"), {}, {}));
     
-            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("enquiry"), response, {}));
+            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("canteen"), response, {}));
         } catch (error) {
             console.log(error);
             return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))

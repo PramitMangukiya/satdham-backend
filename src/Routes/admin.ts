@@ -50,6 +50,20 @@ router.delete("/grouphead/delete/:id" , adminController.delete_groupHead_by_id);
 router.post("/grouphead/get/all" , adminController.get_all_groupHead);
 router.get("/grouphead/:id" , adminController.get_by_id_groupHead);
 
+//------------------------ canteen -----------------------------------------
+router.post("/canteen/add" , adminController.add_canteen);
+router.patch("/canteen/edit" , adminController.edit_canteen_by_id);
+router.delete("/canteen/delete/:id" , adminController.delete_canteen_by_id);
+router.post("/canteen/get/all" , adminController.get_all_canteen);
+router.get("/canteen/:id" , adminController.get_by_id_canteen);
+
+//------------------------ transportation -----------------------------------------
+router.post("/transportation/add" , adminController.add_transportation);
+router.patch("/transportation/edit" , adminController.edit_transportation_by_id);
+router.delete("/transportation/delete/:id" , adminController.delete_transportation_by_id);
+router.post("/transportation/get/all" , adminController.get_all_transportation);
+router.get("/transportation/:id" , adminController.get_by_id_transportation);
+
 
 
 

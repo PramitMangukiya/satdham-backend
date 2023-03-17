@@ -87,6 +87,8 @@ export const edit_user_by_id = async(req,res) =>
         }
       
         const response = await userModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
+        if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("user") , {} , {}));
+
         return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("user"), response, {}));
     } catch (error) {
         console.log(error);
@@ -102,6 +104,7 @@ export const delete_user_by_id = async(req,res) =>
         {id} = req.params
     try {
         const response = await userModel.findOneAndUpdate({_id :ObjectId(id) , isActive : true} , {isActive : false} , {new : true})
+        if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("user"), {}, {}));
         return res.status(200).json(new apiResponse(200, responseMessage.deleteDataSuccess("user"), {}, {}));
     } catch (error) {
         console.log(error);
