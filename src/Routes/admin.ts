@@ -16,6 +16,7 @@ router.post("/reset/password" , authController.reset_password);
 
 //------------------------ User -----------------------------------------
 router.use(adminJWT);
+router.get("/standard/get/list" , adminController.get_standard_list_wo_pagination);
 router.post("/user/add" , adminController.add_user);
 router.patch("/user/edit" , adminController.edit_user_by_id);
 router.delete("/user/delete/:id" , adminController.delete_user_by_id);

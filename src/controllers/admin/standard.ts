@@ -111,3 +111,15 @@ export const get_by_id_standard = async(req,res)=>
 }
 }
 
+export const get_standard_list_wo_pagination = async (req, res) => {
+    reqInfo(req)
+    let response: any, {} = req.body, match: any = {};
+    try {
+      
+        let standardList = await standardModel.find({isActive : true}).select("number name");
+        return res.status(200).json(new apiResponse(200 , responseMessage?.getDataSuccess("standardList") , standardList , {}));
+         
+    } catch (error) {
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
