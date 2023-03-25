@@ -17,9 +17,16 @@ export const add_user = async (req: Request, res: Response) => {
         //if in one class same roll no is present then ?
         if((!body?.userType) || body.userType != "faculty")
         {
+
             prefix = "U"; //setted prefix as a user
             const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+
+             //(penindg)standard pramane fees attach karvani - done
+             body.standard = ObjectId(body.standard);
+            const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
+            body.totalFees = standard.fees;
+            body.pendingFees = standard.fees;
         }
         if(body.userType == "faculty"){
             prefix = "F"; //setted prefix as a user
@@ -28,19 +35,13 @@ export const add_user = async (req: Request, res: Response) => {
         }
 
         while(!userId){
-            
             let temp = generateUserId(prefix);
            const copy =  await userModel.findOne({userId : temp , isActive : true ,userType : "user"});
            if(!copy) userId = temp;
         }
         body.userId = userId;
         if(!body.password) body.password = generatePassword();
-        body.standard = ObjectId(body.standard);
 
-        //(penindg)standard pramane fees attach karvani - done
-        const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
-        body.totalFees = standard.fees;
-        body.pendingFees = standard.fees;
         const response = await new userModel(body).save();
         if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("user") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
