@@ -25,8 +25,8 @@ export const add_user = async (req: Request, res: Response) => {
              //(penindg)standard pramane fees attach karvani - done
              body.standard = ObjectId(body.standard);
             const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
-            body.totalFees = standard.fees;
-            body.pendingFees = standard.fees;
+            body.totalFees = standard?.fees || 0;
+            body.pendingFees = standard?.fees || 0;
         }
         if(body.userType == "faculty"){
             prefix = "F"; //setted prefix as a user

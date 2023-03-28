@@ -30,8 +30,8 @@ const add_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             //(penindg)standard pramane fees attach karvani - done
             body.standard = ObjectId(body.standard);
             const standard = yield database_1.standardModel.findOne({ _id: ObjectId(body === null || body === void 0 ? void 0 : body.standard), isActive: true });
-            body.totalFees = standard.fees;
-            body.pendingFees = standard.fees;
+            body.totalFees = (standard === null || standard === void 0 ? void 0 : standard.fees) || 0;
+            body.pendingFees = (standard === null || standard === void 0 ? void 0 : standard.fees) || 0;
         }
         if (body.userType == "faculty") {
             prefix = "F"; //setted prefix as a user
