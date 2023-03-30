@@ -116,7 +116,7 @@ export const get_standard_list_wo_pagination = async (req, res) => {
     let response: any, {} = req.body, match: any = {};
     try {
       
-        let standardList = await standardModel.find({isActive : true}).select("number name");
+        let standardList = await standardModel.find({isActive : true});
         return res.status(200).json(new apiResponse(200 , responseMessage?.getDataSuccess("standardList") , standardList , {}));
          
     } catch (error) {

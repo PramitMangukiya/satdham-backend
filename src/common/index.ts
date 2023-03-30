@@ -43,3 +43,22 @@ export const generateUserId = (prefix)=> {
     return nextDate;
 }
 
+
+
+export const  getMonthEndDate = (monthSDate)=> {
+  // Get the year and month of the input date
+  const year = monthSDate.getFullYear();
+  const month = monthSDate.getMonth();
+
+  // Create a new date object for the first day of the next month
+  const nextMonth = new Date(year, month + 1, 1);
+
+  // Subtract one millisecond from the next month's first day to get the last millisecond of the current month
+  const lastDay = new Date(nextMonth.getTime() - 1);
+
+  // Set the time to 11:59:00 PM
+  lastDay.setHours(23, 59, 0);
+
+  // Return the last day of the month with the last time (11:59:00 PM)
+  return lastDay;
+}

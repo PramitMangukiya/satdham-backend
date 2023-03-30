@@ -73,6 +73,27 @@ export const get_all_groupHead = async (req, res) => {
         response = await groupHeadModel.aggregate([
             { $match: match },
             {
+                $lookup: {
+                    from: "users",
+                    let: { studentId: '$studentId' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$_id', '$$studentId'] },
+                                    ],
+                                },
+                            }
+                        },
+                    ],
+                    as: "user"
+                }
+            },
+            {
+                $unwind : "$user"
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
@@ -92,6 +113,7 @@ export const get_all_groupHead = async (req, res) => {
             }
         }, {}))
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }

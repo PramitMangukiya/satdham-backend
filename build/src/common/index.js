@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.userStatus = exports.apiResponse = void 0;
+exports.getMonthEndDate = exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.userStatus = exports.apiResponse = void 0;
 class apiResponse {
     constructor(status, message, data, error) {
         this.status = status;
@@ -38,4 +38,18 @@ const get_next_Date = (date, day) => {
     return nextDate;
 };
 exports.get_next_Date = get_next_Date;
+const getMonthEndDate = (monthSDate) => {
+    // Get the year and month of the input date
+    const year = monthSDate.getFullYear();
+    const month = monthSDate.getMonth();
+    // Create a new date object for the first day of the next month
+    const nextMonth = new Date(year, month + 1, 1);
+    // Subtract one millisecond from the next month's first day to get the last millisecond of the current month
+    const lastDay = new Date(nextMonth.getTime() - 1);
+    // Set the time to 11:59:00 PM
+    lastDay.setHours(23, 59, 0);
+    // Return the last day of the month with the last time (11:59:00 PM)
+    return lastDay;
+};
+exports.getMonthEndDate = getMonthEndDate;
 //# sourceMappingURL=index.js.map

@@ -123,7 +123,7 @@ const get_standard_list_wo_pagination = (req, res) => __awaiter(void 0, void 0, 
     (0, helper_1.reqInfo)(req);
     let response, {} = req.body, match = {};
     try {
-        let standardList = yield database_1.standardModel.find({ isActive: true }).select("number name");
+        let standardList = yield database_1.standardModel.find({ isActive: true });
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess("standardList"), standardList, {}));
     }
     catch (error) {

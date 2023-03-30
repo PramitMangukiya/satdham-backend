@@ -81,6 +81,27 @@ const get_all_groupHead = (req, res) => __awaiter(void 0, void 0, void 0, functi
         response = yield database_1.groupHeadModel.aggregate([
             { $match: match },
             {
+                $lookup: {
+                    from: "users",
+                    let: { studentId: '$studentId' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$_id', '$$studentId'] },
+                                    ],
+                                },
+                            }
+                        },
+                    ],
+                    as: "user"
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
@@ -101,6 +122,7 @@ const get_all_groupHead = (req, res) => __awaiter(void 0, void 0, void 0, functi
         }, {}));
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
     }
 });

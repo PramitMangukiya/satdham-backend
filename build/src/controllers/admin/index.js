@@ -22,4 +22,5 @@ __exportStar(require("./attendance"), exports);
 __exportStar(require("./grouphead"), exports);
 __exportStar(require("./canteen"), exports);
 __exportStar(require("./transportation"), exports);
+__exportStar(require("./exam"), exports);
 //# sourceMappingURL=index.js.map

@@ -20,6 +20,7 @@ router.patch("/user/edit", controllers_1.adminController.edit_user_by_id);
 router.delete("/user/delete/:id", controllers_1.adminController.delete_user_by_id);
 router.post("/user/get/all", controllers_1.adminController.get_all_user);
 router.get("/user/:id", controllers_1.adminController.get_by_id_user);
+router.post("/user/attendance", controllers_1.adminController.get_user_attendance);
 //------------------------ Enquiry -----------------------------------------
 router.post("/enquiry/add", controllers_1.adminController.add_enquiry);
 router.patch("/enquiry/edit", controllers_1.adminController.edit_enquiry_by_id);
@@ -56,5 +57,11 @@ router.patch("/transportation/edit", controllers_1.adminController.edit_transpor
 router.delete("/transportation/delete/:id", controllers_1.adminController.delete_transportation_by_id);
 router.post("/transportation/get/all", controllers_1.adminController.get_all_transportation);
 router.get("/transportation/:id", controllers_1.adminController.get_by_id_transportation);
+//------------------------ Exam -----------------------------------------
+router.post("/exam/add", controllers_1.adminController.add_exam);
+router.patch("/exam/edit", controllers_1.adminController.edit_exam_by_id);
+router.delete("/exam/delete/:id", controllers_1.adminController.delete_exam_by_id);
+router.post("/exam/get/all", controllers_1.adminController.get_all_exam);
+router.get("/exam/:id", controllers_1.adminController.get_by_id_exam);
 exports.adminRouter = router;
 //# sourceMappingURL=admin.js.map

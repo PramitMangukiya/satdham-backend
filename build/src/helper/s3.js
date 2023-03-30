@@ -33,7 +33,7 @@ const deleteImage = function (file, folder, type, name) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
                     const bucketPath = `${bucket_name}/${folder}/${type}/${file}`;
-                    // console.log(bucketPath , "bucketPath");
+                    // console.log(bucketPath,"bucketPath");
                     let params = {
                         Bucket: bucketPath,
                         Key: name
