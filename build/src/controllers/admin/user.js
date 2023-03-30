@@ -30,7 +30,7 @@ const add_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             //(pending)standard pramane fees attach karvani - done
             body.standard = ObjectId(body.standard);
             const standard = yield database_1.standardModel.findOne({ _id: ObjectId(body === null || body === void 0 ? void 0 : body.standard), isActive: true });
-            body.installments = standard === null || standard === void 0 ? void 0 : standard.installments;
+            // body.installments = standard?.installments
             body.totalFees = (standard === null || standard === void 0 ? void 0 : standard.fees) || 0;
             body.pendingFees = (standard === null || standard === void 0 ? void 0 : standard.fees) || 0;
         }

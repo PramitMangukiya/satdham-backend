@@ -26,7 +26,7 @@ export const add_user = async (req: Request, res: Response) => {
              body.standard = ObjectId(body.standard);
             const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
 
-            body.installments = standard?.installments
+            // body.installments = standard?.installments
             body.totalFees = standard?.fees || 0;
             body.pendingFees = standard?.fees || 0;
         }
