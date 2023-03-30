@@ -193,7 +193,7 @@ const reset_password = (req, res) => __awaiter(void 0, void 0, void 0, function*
         delete body.password;
         delete body.id;
         body.password = hashPassword;
-        let response = yield database_1.userModel.findOneAndUpdate({ email: body === null || body === void 0 ? void 0 : body.email, isActive: true, otp: null }, body, { new: true });
+        let response = yield database_1.userModel.findOneAndUpdate({ email: body === null || body === void 0 ? void 0 : body.email, isActive: true, }, body, { new: true }); // otp: null
         if (response) {
             return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.resetPasswordSuccess, response, {}));
         }
