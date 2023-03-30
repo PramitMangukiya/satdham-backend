@@ -189,6 +189,7 @@ export const reset_password = async (req: Request, res: Response) => {
         body.password = hashPassword
 
         let response = await userModel.findOneAndUpdate({ email: body?.email, isActive: true, otp: null }, body, { new: true })
+        
         if (response) {
             return res.status(200).json(new apiResponse(200, responseMessage?.resetPasswordSuccess, response, {}))
         }

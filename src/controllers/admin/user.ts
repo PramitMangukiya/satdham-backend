@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { apiResponse, generatePassword, generateUserId } from "../../common";
-import { standardModel, userModel } from "../../database";
+import { apiResponse, generatePassword, generateUserId, getMonthEndDate } from "../../common";
+import { attendanceModel, standardModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 
 const ObjectId = require('mongoose').Types.ObjectId
@@ -22,9 +22,11 @@ export const add_user = async (req: Request, res: Response) => {
             const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
 
-             //(penindg)standard pramane fees attach karvani - done
+             //(pending)standard pramane fees attach karvani - done
              body.standard = ObjectId(body.standard);
             const standard = await standardModel.findOne({_id: ObjectId(body?.standard) , isActive : true});
+
+            body.installments = standard?.installments
             body.totalFees = standard?.fees || 0;
             body.pendingFees = standard?.fees || 0;
         }
@@ -181,3 +183,59 @@ export const get_by_id_user = async(req,res)=>
 }
 }
 
+export const get_user_attendance = async(req,res)=>
+{
+        reqInfo(req);
+        let { user } = req.headers,
+            body = req.body,
+          { id , monthStartDate} = req.body , match : any = {};
+        try {
+            let monthEndDate = getMonthEndDate(new Date(monthStartDate));
+
+            // console.log("monthSDate" , new Date(monthStartDate));
+            // console.log("monthEDate" , new Date(monthEndDate));
+
+            match.date = {$gte : monthStartDate , $lte : monthEndDate}
+            let response = await attendanceModel.find({ ...match, isActive : true});
+
+            const responseAttendance = []; // [ {date , attendance : { guj : true , phy : false }}]
+            // response = response?._doc
+
+            // console.log(response);
+            for(let day of response){
+                
+                // console.log(day.date , "date");
+
+                let singleAttendance  = {
+                    date : day?.date,
+                    attendance : {}
+                }
+
+                let attendanceData = day.attendance ;
+
+
+                //iterating in object called attendanceData
+                for(let subject in attendanceData)
+                {
+                    const allStudentData = attendanceData[subject]; //means [] containing all data
+                    //now iterate over that data to find our user and if user is present then send true or false
+                    
+                        const data = allStudentData.find(item =>
+                            item._id = ObjectId(id)
+                            )
+
+                            // console.log("studentStatus" , data);
+                    // console.log( , "loaded subject");
+                    singleAttendance.attendance[subject] = data.attendance
+
+                }
+                responseAttendance.push(singleAttendance);
+            }
+            if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("user"), {}, {}));
+    
+            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("user"), responseAttendance, {}));
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+}
+}

@@ -6,7 +6,7 @@ const standardSchema: any = new mongoose.Schema({
     fees : {type : Number},
     subjects : [{type : String}],
     
-    timetable : {
+    timetable : {   
         monday : [ //total 8 slot will be there
             {
                 subject : {type : String} , 

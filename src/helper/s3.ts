@@ -20,7 +20,7 @@ export const deleteImage = async function (file: any, folder: any , type : any ,
     return new Promise(async function (resolve, reject) {
         try {
             const bucketPath = `${bucket_name}/${folder}/${type}/${file}`
-            // console.log(bucketPath , "bucketPath");
+            // console.log(bucketPath,"bucketPath");
             let params = {
                 Bucket: bucketPath,
                 Key: name
