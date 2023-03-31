@@ -38,6 +38,12 @@ const database_1 = require("./database");
 const packageInfo = __importStar(require("../package.json"));
 const Routes_1 = require("./Routes");
 const app = (0, express_1.default)();
+// var options = {
+//     "origin": "*",
+//     "methods": "GET,HEAD,PUT,PATCH,POST,DELETE",
+//     "preflightContinue": false,
+//     "optionsSuccessStatus": 204
+//   }
 app.use((0, cors_1.default)());
 app.use(database_1.mongooseConnection);
 app.use(bodyParser.json({ limit: '200mb' }));
