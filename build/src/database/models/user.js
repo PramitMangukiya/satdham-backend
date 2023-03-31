@@ -27,6 +27,8 @@ const userSchema = new mongoose.Schema({
     password: { type: String },
     profilePhoto: { type: String },
     //parent details
+    fatherImage: { type: String },
+    motherImage: { type: String },
     fatherName: { type: String },
     motherName: { type: String },
     accHolderName: { type: String },

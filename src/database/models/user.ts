@@ -29,6 +29,8 @@ const userSchema: any = new mongoose.Schema({
     profilePhoto : {type : String},
 
     //parent details
+    fatherImage :  { type : String},
+    motherImage :  { type : String},
     fatherName : {type : String},
     motherName : {type : String},
     accHolderName : {type : String},

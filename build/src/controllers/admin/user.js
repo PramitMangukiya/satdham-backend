@@ -141,6 +141,7 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.log(match);
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true;
+        match.userType = "user";
         response = yield database_1.userModel.aggregate([
             { $match: match },
             {

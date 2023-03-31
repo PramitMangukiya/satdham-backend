@@ -140,6 +140,7 @@ export const get_all_user = async (req, res) => {
 
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
+        match.userType = "user"
         response = await userModel.aggregate([
             { $match: match },
             {

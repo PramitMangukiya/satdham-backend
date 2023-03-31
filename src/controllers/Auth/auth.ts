@@ -181,18 +181,18 @@ export const reset_password = async (req: Request, res: Response) => {
         { email } = body;
 
     try {
-
+console.log(body);
         const salt = await bcryptjs.genSaltSync(10)
         const hashPassword = await bcryptjs.hash(body.password, salt)
         delete body.password
         delete body.id
         body.password = hashPassword
 
-        let response = await userModel.findOneAndUpdate({ email: body?.email, isActive: true, }, body, { new: true }) // otp: null
+        let response = await userModel.findOneAndUpdate({ email: body?.email, isActive: true}, body, { new: true }) // otp: null
         
-        if (response) {
+        if (response) 
             return res.status(200).json(new apiResponse(200, responseMessage?.resetPasswordSuccess, response, {}))
-        }
+        
         else return res.status(501).json(new apiResponse(501, responseMessage?.resetPasswordError, {}, {}))
 
     } catch (error) {
