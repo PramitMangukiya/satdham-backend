@@ -145,6 +145,27 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         response = yield database_1.userModel.aggregate([
             { $match: match },
             {
+                $lookup: {
+                    from: "standards",
+                    let: { stdId: '$standard' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$_id', '$$stdId'] },
+                                    ],
+                                },
+                            }
+                        },
+                    ],
+                    as: "standard"
+                }
+            },
+            {
+                $unwind: "$standard"
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
@@ -173,7 +194,7 @@ const get_by_id_user = (req, res) => __awaiter(void 0, void 0, void 0, function*
     (0, helper_1.reqInfo)(req);
     let { user } = req.headers, body = req.body, { id } = req.params;
     try {
-        const response = yield database_1.userModel.findOne({ _id: ObjectId(id), isActive: true });
+        const response = yield database_1.userModel.findOne({ _id: ObjectId(id), isActive: true }).populate("siblings._id");
         if (!response)
             return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage.getDataNotFound("user"), {}, {}));
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.getDataSuccess("user"), response, {}));

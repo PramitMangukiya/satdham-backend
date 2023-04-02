@@ -144,6 +144,27 @@ export const get_all_user = async (req, res) => {
         response = await userModel.aggregate([
             { $match: match },
             {
+                $lookup: {
+                    from: "standards",
+                    let: { stdId: '$standard' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$_id', '$$stdId'] },
+                                    ],
+                                },
+                            }
+                        },
+                    ],
+                    as: "standard"
+                }
+            },
+            {
+                $unwind : "$standard"
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
@@ -174,7 +195,7 @@ export const get_by_id_user = async(req,res)=>
             body = req.body,
           { id } = req.params;
         try {
-            const response = await userModel.findOne({ _id : ObjectId(id) , isActive : true});
+            const response = await userModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("siblings._id");
             if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("user"), {}, {}));
     
             return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("user"), response, {}));
