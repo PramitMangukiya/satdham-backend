@@ -45,6 +45,12 @@ const standardSchema = new mongoose.Schema({
             }
         ],
     },
+    features: [
+        {
+            type: { type: String },
+            amount: { type: Number }
+        }
+    ],
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 exports.standardModel = mongoose.model('standard', standardSchema);

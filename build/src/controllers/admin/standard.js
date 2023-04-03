@@ -20,6 +20,9 @@ const add_standard = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     { user } = req.headers;
     try {
         //assign standardId and password
+        let isExist = yield database_1.standardModel.findOne({ number: body.number, isActive: true });
+        if (isExist)
+            return res.status(404).json(new common_1.apiResponse(200, "Standard number exist already!", {}, {}));
         const response = yield new database_1.standardModel(body).save();
         if (response)
             return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.addDataSuccess("standard"), response, {}));

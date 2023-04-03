@@ -12,6 +12,8 @@ export const add_standard = async (req: Request, res: Response) => {
         {user} : any = req.headers;
     try {
         //assign standardId and password
+        let isExist = await standardModel.findOne({number : body.number , isActive : true});
+        if(isExist) return res.status(404).json(new apiResponse(200 , "Standard number exist already!" , {} , {}));
         const response = await new standardModel(body).save();
         if(response) return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("standard") , response , {}));
          return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
