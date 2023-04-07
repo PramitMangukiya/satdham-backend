@@ -166,6 +166,11 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 $unwind: "$standard"
             },
             {
+                $addFields: {
+                    stdName: "$standard.name" //added for frontend 
+                }
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },

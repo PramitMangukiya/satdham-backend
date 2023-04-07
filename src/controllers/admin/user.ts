@@ -165,6 +165,11 @@ export const get_all_user = async (req, res) => {
                 $unwind : "$standard"
             },
             {
+                $addFields: {
+                    stdName: "$standard.name"  //added for frontend 
+                }
+            },
+            {
                 $facet: {
                     data: [
                         { $sort: { createdAt: -1 } },
