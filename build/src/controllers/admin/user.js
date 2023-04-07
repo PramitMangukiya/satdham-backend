@@ -197,12 +197,59 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 exports.get_all_user = get_all_user;
 const get_by_id_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
-    let { user } = req.headers, body = req.body, { id } = req.params;
+    let { user } = req.headers, body = req.body, { id } = req.params, match = {};
     try {
-        const response = yield database_1.userModel.findOne({ _id: ObjectId(id), isActive: true }).populate("siblings._id");
+        // const response = await userModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("siblings._id");
+        match._id = ObjectId(id);
+        match.isActive = true;
+        const response = yield database_1.userModel.aggregate([
+            { $match: match },
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$_id', '$$userId'] },
+                                    ],
+                                },
+                            }
+                        },
+                        {
+                            $addFields: {
+                                relation: "$siblings.relation"
+                            }
+                        },
+                        {
+                            $unwind: "$relation"
+                        },
+                        {
+                            $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                middleName: 1,
+                                profilePhoto: 1,
+                                standard: 1,
+                                phoneNumber: 1,
+                                email: 1,
+                                siblings: 1,
+                                class: 1,
+                                rollNo: 1,
+                                address: 1,
+                                relation: 1
+                            }
+                        }
+                    ],
+                    as: "siblings",
+                }
+            }
+        ]);
         if (!response)
             return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage.getDataNotFound("user"), {}, {}));
-        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.getDataSuccess("user"), response, {}));
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.getDataSuccess("user"), response[0], {}));
     }
     catch (error) {
         console.log(error);

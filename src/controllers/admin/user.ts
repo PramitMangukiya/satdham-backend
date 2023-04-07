@@ -198,12 +198,62 @@ export const get_by_id_user = async(req,res)=>
         reqInfo(req);
         let { user } = req.headers,
             body = req.body,
-          { id } = req.params;
+          { id } = req.params,
+          match : any = {};
         try {
-            const response = await userModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("siblings._id");
+            // const response = await userModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("siblings._id");
+
+            match._id  = ObjectId(id)
+            match.isActive =  true;
+           const response = await userModel.aggregate([
+                { $match: match },
+                {
+                    $lookup: {
+                        from: "users",
+                        let: { userId: '$_id' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            { $eq: ['$_id', '$$userId'] },
+                                        ],
+                                    },
+                                }
+                            },
+                            {
+                                $addFields : {
+                                    relation : "$siblings.relation"
+                                }
+                            },
+                            {
+                                $unwind : "$relation"
+                            },
+                            {
+                                $project :  {
+                                    firstName : 1 ,
+                                    lastName : 1 ,
+                                    middleName : 1 ,
+                                    profilePhoto : 1 ,
+                                    standard : 1,
+                                    phoneNumber : 1,
+                                    email : 1 ,
+                                    siblings : 1 ,
+                                    class : 1,
+                                    rollNo :  1,
+                                    address : 1,
+                                    relation : 1
+                                }
+                            }
+                        ],
+                        as: "siblings" ,
+                        
+                    }
+                }
+            ])
             if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("user"), {}, {}));
     
-            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("user"), response, {}));
+            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("user"), response[0], {}));
         } catch (error) {
             console.log(error);
             return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
