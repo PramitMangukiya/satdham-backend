@@ -78,6 +78,7 @@ const edit_user_by_id = (req, res) => __awaiter(void 0, void 0, void 0, function
                 if (isExist)
                     return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.dataAlreadyExist("Roll no"), {}, {}));
             }
+            console.log(body === null || body === void 0 ? void 0 : body.siblings, "siblings");
             if (((_a = body === null || body === void 0 ? void 0 : body.siblings) === null || _a === void 0 ? void 0 : _a.length) > 0) {
                 for (let i = 0; i < body.siblings.length; i++) {
                     let item = body.siblings[i];
@@ -93,6 +94,7 @@ const edit_user_by_id = (req, res) => __awaiter(void 0, void 0, void 0, function
                 return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.dataAlreadyExist("Phone number"), {}, {}));
         }
         const response = yield database_1.userModel.findOneAndUpdate({ _id: ObjectId(body._id), isActive: true }, body, { new: true });
+        console.log(response.siblings, "updated siblings");
         if (!response)
             return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.updateDataError("user"), {}, {}));
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.updateDataSuccess("user"), response, {}));
@@ -141,7 +143,6 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         console.log(match);
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true;
-        match.userType = "user";
         response = yield database_1.userModel.aggregate([
             { $match: match },
             {
@@ -207,24 +208,16 @@ const get_by_id_user = (req, res) => __awaiter(void 0, void 0, void 0, function*
             {
                 $lookup: {
                     from: "users",
-                    let: { userId: '$_id' },
+                    let: { siblingIds: '$siblings._id' },
                     pipeline: [
                         {
                             $match: {
                                 $expr: {
                                     $and: [
-                                        { $eq: ['$_id', '$$userId'] },
+                                        { $in: ["$_id", "$$siblingIds"] }
                                     ],
                                 },
-                            }
-                        },
-                        {
-                            $addFields: {
-                                relation: "$siblings.relation"
-                            }
-                        },
-                        {
-                            $unwind: "$relation"
+                            },
                         },
                         {
                             $project: {
@@ -235,17 +228,43 @@ const get_by_id_user = (req, res) => __awaiter(void 0, void 0, void 0, function*
                                 standard: 1,
                                 phoneNumber: 1,
                                 email: 1,
-                                siblings: 1,
                                 class: 1,
                                 rollNo: 1,
                                 address: 1,
-                                relation: 1
                             }
                         }
                     ],
-                    as: "siblings",
+                    as: "sibs",
                 }
-            }
+            },
+            {
+                $addFields: {
+                    siblings: {
+                        $map: {
+                            input: "$siblings",
+                            as: "sibling",
+                            in: {
+                                $mergeObjects: [
+                                    {
+                                        $arrayElemAt: [
+                                            {
+                                                $filter: {
+                                                    input: "$sibs",
+                                                    cond: {
+                                                        $eq: ["$$this._id", "$$sibling._id"],
+                                                    },
+                                                },
+                                            },
+                                            0,
+                                        ],
+                                    },
+                                    { relation: "$$sibling.relation" },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
         ]);
         if (!response)
             return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage.getDataNotFound("user"), {}, {}));

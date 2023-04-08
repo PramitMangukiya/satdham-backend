@@ -74,6 +74,7 @@ export const edit_user_by_id = async(req,res) =>
                 console.log(isExist);
                 if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
             }
+            console.log(body?.siblings , "siblings");
             if(body?.siblings?.length > 0)
             {
                 for(let i = 0 ; i < body.siblings.length ; i ++){
@@ -92,6 +93,8 @@ export const edit_user_by_id = async(req,res) =>
         }
       
         const response = await userModel.findOneAndUpdate({_id :ObjectId(body._id) , isActive : true} , body , {new : true})
+
+        console.log(response.siblings, "updated siblings");
         if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("user") , {} , {}));
 
         return res.status(200).json(new apiResponse(200, responseMessage.updateDataSuccess("user"), response, {}));
@@ -140,7 +143,6 @@ export const get_all_user = async (req, res) => {
 
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
-        match.userType = "user"
         response = await userModel.aggregate([
             { $match: match },
             {
@@ -210,24 +212,16 @@ export const get_by_id_user = async(req,res)=>
                 {
                     $lookup: {
                         from: "users",
-                        let: { userId: '$_id' },
+                        let: { siblingIds: '$siblings._id' },
                         pipeline: [
                             {
                                 $match: {
                                     $expr: {
                                         $and: [
-                                            { $eq: ['$_id', '$$userId'] },
+                                            { $in: ["$_id", "$$siblingIds"] }
                                         ],
                                     },
-                                }
-                            },
-                            {
-                                $addFields : {
-                                    relation : "$siblings.relation"
-                                }
-                            },
-                            {
-                                $unwind : "$relation"
+                                },
                             },
                             {
                                 $project :  {
@@ -238,18 +232,45 @@ export const get_by_id_user = async(req,res)=>
                                     standard : 1,
                                     phoneNumber : 1,
                                     email : 1 ,
-                                    siblings : 1 ,
                                     class : 1,
                                     rollNo :  1,
                                     address : 1,
-                                    relation : 1
                                 }
                             }
                         ],
-                        as: "siblings" ,
+                        as: "sibs" ,
                         
                     }
-                }
+                },
+                {
+                    $addFields: {
+                      siblings: {
+                        $map: {
+                          input: "$siblings",
+                          as: "sibling",
+                          in: {
+                            $mergeObjects: [
+                              {
+                                $arrayElemAt: [
+                                  {
+                                    $filter: {
+                                      input: "$sibs",
+                                      cond: {
+                                        $eq: ["$$this._id", "$$sibling._id"],
+                                      },
+                                    },
+                                  },
+                                  0,
+                                ],
+                              },
+                              { relation: "$$sibling.relation" },
+                            ],
+                          },
+                        },
+                      },
+                    },
+                  },
+    
             ])
             if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("user"), {}, {}));
     
