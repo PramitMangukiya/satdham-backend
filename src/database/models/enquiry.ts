@@ -4,6 +4,7 @@ const enquirySchema: any = new mongoose.Schema({
     type : {type : Number , enum:[0,1]}, //0-->student , 1--> faculty
     //student 
     name : {type  : String},
+    profilePhoto : { type : String},
     fatherName : { type : String},
     currStandard :  {type : Number},
     applyStandard : { type : Number},

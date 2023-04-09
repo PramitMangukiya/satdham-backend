@@ -72,4 +72,9 @@ router.post("/exam/edit" , adminController.edit_exam_by_id);
 router.delete("/exam/delete/:id" , adminController.delete_exam_by_id);
 router.post("/exam/get/all" , adminController.get_all_exam);
 router.get("/exam/:id" , adminController.get_by_id_exam);
+//----------------------- Marks Entry --------------------------------------
+router.post("/exam/marks/edit" , adminController.edit_or_add_exam_marks_of_student);
+router.post("/exam/get/students/all" , adminController.get_registered_student_by_exam_id);
+
+
 export const adminRouter = router

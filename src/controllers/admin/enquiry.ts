@@ -57,7 +57,7 @@ export const delete_enquiry_by_id = async(req,res) =>
 
 export const get_all_enquiry = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , enquiryFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , userType} = req.body, match: any = {};
     try {
         if (search){
             var enquiryArray: Array<any> = []
@@ -67,9 +67,9 @@ export const get_all_enquiry = async (req, res) => {
             })
             match.$or = [{ $and: enquiryArray }]
         }
-        // if(enquiryFilter) match.subjectId = ObjectId(enquiryFilter);
-        // if(blockFilter) match.isBlock = blockFilter;
+        if(userType || (userType == 0)) match.type = userType;
         match.isActive = true
+        console.log("match" , match);
         response = await enquiryModel.aggregate([
             { $match: match },
             {

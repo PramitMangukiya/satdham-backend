@@ -64,7 +64,7 @@ exports.delete_enquiry_by_id = delete_enquiry_by_id;
 const get_all_enquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     (0, helper_1.reqInfo)(req);
-    let response, { page, limit, search, enquiryFilter } = req.body, match = {};
+    let response, { page, limit, search, userType } = req.body, match = {};
     try {
         if (search) {
             var enquiryArray = [];
@@ -74,9 +74,10 @@ const get_all_enquiry = (req, res) => __awaiter(void 0, void 0, void 0, function
             });
             match.$or = [{ $and: enquiryArray }];
         }
-        // if(enquiryFilter) match.subjectId = ObjectId(enquiryFilter);
-        // if(blockFilter) match.isBlock = blockFilter;
+        if (userType || (userType == 0))
+            match.type = userType;
         match.isActive = true;
+        console.log("match", match);
         response = yield database_1.enquiryModel.aggregate([
             { $match: match },
             {
