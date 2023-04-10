@@ -337,3 +337,51 @@ export const get_user_attendance = async(req,res)=>
             return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
 }
 }
+
+export const get_all_faculty = async (req, res) => {
+    reqInfo(req)
+    let response: any, { page, limit, search  } = req.body, match: any = {};
+    try {
+        if (search){
+            var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
+            userIdArray: Array<any> = []
+            search = search.split(" ")
+            search.forEach(data => {
+                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } })
+                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } })
+                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } })
+                userIdArray.push({ userId: { $regex: data, $options: 'si' } })
+            })
+            match.$or = [{ $and: firstNameArray }]
+        }
+
+        console.log(match);
+
+        // if(blockFilter) match.isBlock = blockFilter;
+        match.isActive = true
+        match.userType  = "faculty"
+        response = await userModel.aggregate([
+            { $match: match },
+            {
+                $facet: {
+                    data: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: (((page as number - 1) * limit as number)) },
+                        { $limit: limit as number },
+                    ],
+                    data_count: [{ $count: "count" }]
+                }
+            },
+        ])
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess('faculty'), {
+            faculty_data: response[0].data,
+            state: {
+                page: page as number,
+                limit: limit as number,
+                page_limit: Math.ceil(response[0].data_count[0]?.count / (req.body?.limit) as number) || 1,
+            }
+        }, {}))
+    } catch (error) {
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}

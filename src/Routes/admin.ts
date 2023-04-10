@@ -23,6 +23,8 @@ router.delete("/user/delete/:id" , adminController.delete_user_by_id);
 router.post("/user/get/all" , adminController.get_all_user);
 router.get("/user/:id" , adminController.get_by_id_user);
 router.post("/user/attendance" , adminController.get_user_attendance)
+router.post("/faculty/get/all" , adminController.get_all_faculty);
+
 
 //------------------------ Enquiry -----------------------------------------
 router.post("/enquiry/add" , adminController.add_enquiry);
