@@ -66,5 +66,6 @@ router.get("/exam/:id", controllers_1.adminController.get_by_id_exam);
 //----------------------- Marks Entry --------------------------------------
 router.post("/exam/marks/edit", controllers_1.adminController.edit_or_add_exam_marks_of_student);
 router.post("/exam/get/students/all", controllers_1.adminController.get_registered_student_by_exam_id);
+router.get("/exam/marks/:id", controllers_1.adminController.get_by_id_student_exam);
 exports.adminRouter = router;
 //# sourceMappingURL=admin.js.map

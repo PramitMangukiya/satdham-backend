@@ -75,6 +75,8 @@ router.get("/exam/:id" , adminController.get_by_id_exam);
 //----------------------- Marks Entry --------------------------------------
 router.post("/exam/marks/edit" , adminController.edit_or_add_exam_marks_of_student);
 router.post("/exam/get/students/all" , adminController.get_registered_student_by_exam_id);
+router.get("/exam/marks/:id" , adminController.get_by_id_student_exam);
+
 
 
 export const adminRouter = router

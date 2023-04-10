@@ -312,3 +312,30 @@ export const get_registered_student_by_exam_id = async (req, res) => {
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
+
+export const get_by_id_student_exam = async(req,res)=>
+{
+        reqInfo(req);
+        let { exam } = req.headers,
+            body = req.body,
+          { id } = req.params;
+        try {
+            const response = await examStudentModel.findOne({ _id : ObjectId(id)}).populate({
+                path : "studentId" ,
+                select : "firstName lastName middleName rollNo class phone"
+            }).lean();
+
+            // let registerStudents= await examStudentModel.find({examId : ObjectId(response?._id)})
+                                                        // .populate({
+                                                        //     path: "studentId",
+                                                        //     select: "firstName lastName middleName rollNo class",
+                                                        //     as: "student"
+                                                        //   });
+
+            // console.log(registerStudents[0] , "student log");
+            if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("exam"), {}, {}));
+            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("exam"), response, {}));
+        } catch (error) {
+            console.log(error);
+            return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+}}

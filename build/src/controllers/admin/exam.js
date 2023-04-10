@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_registered_student_by_exam_id = exports.edit_or_add_exam_marks_of_student = exports.get_by_id_exam = exports.get_all_exam = exports.delete_exam_by_id = exports.edit_exam_by_id = exports.add_exam = void 0;
+exports.get_by_id_student_exam = exports.get_registered_student_by_exam_id = exports.edit_or_add_exam_marks_of_student = exports.get_by_id_exam = exports.get_all_exam = exports.delete_exam_by_id = exports.edit_exam_by_id = exports.add_exam = void 0;
 const common_1 = require("../../common");
 const database_1 = require("../../database");
 const helper_1 = require("../../helper");
@@ -312,4 +312,29 @@ const get_registered_student_by_exam_id = (req, res) => __awaiter(void 0, void 0
     }
 });
 exports.get_registered_student_by_exam_id = get_registered_student_by_exam_id;
+const get_by_id_student_exam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, helper_1.reqInfo)(req);
+    let { exam } = req.headers, body = req.body, { id } = req.params;
+    try {
+        const response = yield exam_student_1.examStudentModel.findOne({ _id: ObjectId(id) }).populate({
+            path: "studentId",
+            select: "firstName lastName middleName rollNo class phone"
+        }).lean();
+        // let registerStudents= await examStudentModel.find({examId : ObjectId(response?._id)})
+        // .populate({
+        //     path: "studentId",
+        //     select: "firstName lastName middleName rollNo class",
+        //     as: "student"
+        //   });
+        // console.log(registerStudents[0] , "student log");
+        if (!response)
+            return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage.getDataNotFound("exam"), {}, {}));
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.getDataSuccess("exam"), response, {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.get_by_id_student_exam = get_by_id_student_exam;
 //# sourceMappingURL=exam.js.map
