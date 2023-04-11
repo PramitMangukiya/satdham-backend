@@ -149,7 +149,7 @@ const get_by_id_exam = (req, res) => __awaiter(void 0, void 0, void 0, function*
     (0, helper_1.reqInfo)(req);
     let { exam } = req.headers, body = req.body, { id } = req.params;
     try {
-        const response = yield database_1.examModel.findOne({ _id: ObjectId(id), isActive: true }).lean();
+        const response = yield database_1.examModel.findOne({ _id: ObjectId(id), isActive: true }).populate("standard").lean();
         // let registerStudents= await examStudentModel.find({examId : ObjectId(response?._id)})
         // .populate({
         //     path: "studentId",

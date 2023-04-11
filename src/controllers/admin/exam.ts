@@ -148,7 +148,7 @@ export const get_by_id_exam = async(req,res)=>
             body = req.body,
           { id } = req.params;
         try {
-            const response = await examModel.findOne({ _id : ObjectId(id) , isActive : true}).lean();
+            const response = await examModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("standard").lean();
 
             // let registerStudents= await examStudentModel.find({examId : ObjectId(response?._id)})
                                                         // .populate({
