@@ -36,7 +36,8 @@ const userSchema: any = new mongoose.Schema({
     accHolderName : {type : String},
     accNumber : {type : String},
     ifscCode : {type : String},
-
+    swiftCode : {type : String},
+    bankName : { type : String},
     //sibling
     siblings : [
     {
