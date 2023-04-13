@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_user_attendance = exports.get_by_id_user = exports.get_all_user = exports.delete_user_by_id = exports.edit_user_by_id = exports.add_user = void 0;
+exports.get_all_faculty = exports.get_user_attendance = exports.get_by_id_user = exports.get_all_user = exports.delete_user_by_id = exports.edit_user_by_id = exports.add_user = void 0;
 const common_1 = require("../../common");
 const database_1 = require("../../database");
 const helper_1 = require("../../helper");
@@ -316,4 +316,51 @@ const get_user_attendance = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.get_user_attendance = get_user_attendance;
+const get_all_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d, _e;
+    (0, helper_1.reqInfo)(req);
+    let response, { page, limit, search } = req.body, match = {};
+    try {
+        if (search) {
+            var firstNameArray = [], lastNameArray = [], phoneNumberArray = [], userIdArray = [];
+            search = search.split(" ");
+            search.forEach(data => {
+                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } });
+                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } });
+                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } });
+                userIdArray.push({ userId: { $regex: data, $options: 'si' } });
+            });
+            match.$or = [{ $and: firstNameArray }];
+        }
+        console.log(match);
+        // if(blockFilter) match.isBlock = blockFilter;
+        match.isActive = true;
+        match.userType = "faculty";
+        response = yield database_1.userModel.aggregate([
+            { $match: match },
+            {
+                $facet: {
+                    data: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: (page - 1) * limit },
+                        { $limit: limit },
+                    ],
+                    data_count: [{ $count: "count" }]
+                }
+            },
+        ]);
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess('faculty'), {
+            faculty_data: response[0].data,
+            state: {
+                page: page,
+                limit: limit,
+                page_limit: Math.ceil(((_d = response[0].data_count[0]) === null || _d === void 0 ? void 0 : _d.count) / ((_e = req.body) === null || _e === void 0 ? void 0 : _e.limit)) || 1,
+            }
+        }, {}));
+    }
+    catch (error) {
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.get_all_faculty = get_all_faculty;
 //# sourceMappingURL=user.js.map

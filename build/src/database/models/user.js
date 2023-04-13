@@ -43,6 +43,8 @@ const userSchema = new mongoose.Schema({
     accNumber: { type: String },
     accHolderName: { type: String },
     ifscCode: { type: String },
+    bankName: { type: String },
+    swiftCode: { type: String },
     //father's Details
     fatherImage: { type: String },
     fatherName: { type: String },
@@ -87,6 +89,7 @@ const userSchema = new mongoose.Schema({
     //achievements 
     achievements: [
         {
+            date: { type: Date },
             name: { type: String },
             description: { type: String },
             certificate: { type: String }

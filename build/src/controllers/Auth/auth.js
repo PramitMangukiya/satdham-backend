@@ -28,9 +28,6 @@ const signUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let isAlready = yield database_1.userModel.findOne({ email: body === null || body === void 0 ? void 0 : body.email, isActive: true });
         if (isAlready)
             return res.status(409).json(new common_1.apiResponse(409, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.alreadyEmail, {}, {}));
-        isAlready = yield database_1.userModel.findOne({ phoneNumber: body === null || body === void 0 ? void 0 : body.phoneNumber, isActive: true });
-        if (isAlready)
-            return res.status(409).json(new common_1.apiResponse(409, "phone number exist already", {}, {}));
         if ((isAlready === null || isAlready === void 0 ? void 0 : isAlready.isBlock) == true)
             return res.status(403).json(new common_1.apiResponse(403, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.accountBlock, {}, {}));
         body.userType = "admin";

@@ -23,6 +23,8 @@ router.delete("/user/delete/:id" , adminController.delete_user_by_id);
 router.post("/user/get/all" , adminController.get_all_user);
 router.get("/user/:id" , adminController.get_by_id_user);
 router.post("/user/attendance" , adminController.get_user_attendance)
+router.post("/faculty/get/all" , adminController.get_all_faculty);
+
 
 //------------------------ Enquiry -----------------------------------------
 router.post("/enquiry/add" , adminController.add_enquiry);
@@ -75,6 +77,8 @@ router.get("/exam/:id" , adminController.get_by_id_exam);
 //----------------------- Marks Entry --------------------------------------
 router.post("/exam/marks/edit" , adminController.edit_or_add_exam_marks_of_student);
 router.post("/exam/get/students/all" , adminController.get_registered_student_by_exam_id);
+router.get("/exam/marks/:id" , adminController.get_by_id_student_exam);
+
 
 
 export const adminRouter = router

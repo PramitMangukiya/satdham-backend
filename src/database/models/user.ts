@@ -97,6 +97,7 @@ const userSchema: any = new mongoose.Schema({
     //achievements 
     achievements : [
         {
+          date : {type : Date},
           name : {type :String},
           description : {type : String},
           certificate : {type : String}

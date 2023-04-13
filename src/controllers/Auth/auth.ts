@@ -19,8 +19,6 @@ export const signUp = async (req: Request, res: Response) => {
             authToken = 0
             let  isAlready : any = await userModel.findOne({ email: body?.email, isActive: true });
         if (isAlready) return res.status(409).json(new apiResponse(409, responseMessage?.alreadyEmail, {}, {}))
-         isAlready = await userModel.findOne({ phoneNumber: body?.phoneNumber, isActive: true })
-        if (isAlready) return res.status(409).json(new apiResponse(409, "phone number exist already", {}, {}))
         
 
         if (isAlready?.isBlock == true) return res.status(403).json(new apiResponse(403, responseMessage?.accountBlock, {}, {}))
