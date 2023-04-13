@@ -48,6 +48,9 @@ const userSchema: any = new mongoose.Schema({
     accNumber : {type : String},
     accHolderName : {type : String},
     ifscCode : {type : String},
+    bankName:{type : String},
+    swiftCode:{type : String},
+
     //father's Details
     fatherImage :  { type : String},
     fatherName: {type : String},
