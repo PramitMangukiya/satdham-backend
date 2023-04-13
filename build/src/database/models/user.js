@@ -4,41 +4,84 @@ exports.userModel = void 0;
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     //----------------------------- User details -------------------------------
-    //personal details
+    //Student personal details
     firstName: { type: String },
     lastName: { type: String },
     middleName: { type: String },
+    dob: { type: Date },
+    age: { type: String },
+    dobVillage: { type: String },
+    dobTaluka: { type: String },
+    dobDist: { type: String },
+    dobState: { type: String },
+    gender: { type: Boolean },
+    nationality: { type: String },
+    cast: { type: String },
+    category: { type: Boolean },
+    bloodGroup: { type: String },
+    motherTougue: { type: Boolean },
     aadharCard: { type: String },
+    isSingleChild: { type: Boolean },
+    isInEws: { type: Boolean },
+    //Residential Address
     address: { type: String },
     area: { type: String },
     city: { type: String },
-    district: { type: String },
+    country: { type: String },
     state: { type: String },
+    district: { type: String },
     zipCode: { type: String },
-    rollNo: { type: Number },
+    rollNo: { type: String },
     standard: { type: mongoose.Schema.Types.ObjectId, ref: "standard" },
     class: { type: String },
-    dob: { type: Date },
-    bloodGroup: { type: String },
-    preSchool: { type: String },
     email: { type: String },
     phoneNumber: { type: String },
     userId: { type: String },
     password: { type: String },
     profilePhoto: { type: String },
-    //parent details
-    fatherImage: { type: String },
-    motherImage: { type: String },
-    fatherName: { type: String },
-    motherName: { type: String },
-    accHolderName: { type: String },
+    //--------------------------parent details---------------------
     accNumber: { type: String },
+    accHolderName: { type: String },
     ifscCode: { type: String },
+    //father's Details
+    fatherImage: { type: String },
+    fatherName: { type: String },
+    fatherDob: { type: String },
+    fatherQualification: { type: String },
+    fatherOccupation: { type: String },
+    fatherOfficeAddress: { type: String },
+    fatherIncome: { type: String },
+    fatherAadharCard: { type: String },
+    fatherEmail: { type: String },
+    fatherPhone: { type: String },
+    //mother's Details
+    motherImage: { type: String },
+    motherName: { type: String },
+    motherDob: { type: String },
+    motherQualification: { type: String },
+    motherOccupation: { type: String },
+    motherOfficeAddress: { type: String },
+    motherIncome: { type: String },
+    motherAadharCard: { type: String },
+    motherEmail: { type: String },
+    motherPhone: { type: String },
+    //student Medical Examination
+    regOfMedicalOfficer: { type: String },
+    sealOfMedicalInstitution: { type: String },
+    //Previous school Details(if any)
+    preSchool: { type: String },
+    preClassStudyIn: { type: String },
+    preSchoolAffliationNumber: { type: String },
+    preSchoolCode: { type: String },
+    preDiseCode: { type: String },
+    preMedium: { type: Boolean },
+    prelcNumber: { type: String },
+    preBoard: { type: Boolean },
     //sibling
     siblings: [
         {
             _id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-            relation: { type: String }
+            relation: { type: String },
         }
     ],
     //achievements 
