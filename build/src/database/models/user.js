@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     //----------------------------- User details -------------------------------
     //Student personal details
+    profilePhoto: { type: String },
     firstName: { type: String },
     lastName: { type: String },
     middleName: { type: String },
@@ -14,12 +15,12 @@ const userSchema = new mongoose.Schema({
     dobTaluka: { type: String },
     dobDist: { type: String },
     dobState: { type: String },
-    gender: { type: Boolean },
+    gender: { type: String, enum: ["male", "female"] },
     nationality: { type: String },
     cast: { type: String },
-    category: { type: Boolean },
+    category: { type: String },
     bloodGroup: { type: String },
-    motherTougue: { type: Boolean },
+    motherTougue: { type: String },
     aadharCard: { type: String },
     isSingleChild: { type: Boolean },
     isInEws: { type: Boolean },
@@ -38,7 +39,6 @@ const userSchema = new mongoose.Schema({
     phoneNumber: { type: String },
     userId: { type: String },
     password: { type: String },
-    profilePhoto: { type: String },
     //--------------------------parent details---------------------
     accNumber: { type: String },
     accHolderName: { type: String },
@@ -76,9 +76,9 @@ const userSchema = new mongoose.Schema({
     preSchoolAffliationNumber: { type: String },
     preSchoolCode: { type: String },
     preDiseCode: { type: String },
-    preMedium: { type: Boolean },
+    preMedium: { type: String },
     prelcNumber: { type: String },
-    preBoard: { type: Boolean },
+    preBoard: { type: String },
     //sibling
     siblings: [
         {
@@ -112,6 +112,7 @@ const userSchema = new mongoose.Schema({
     isActive: { type: Boolean, default: true },
     isBlock: { type: Boolean, default: false },
     isLoggedIn: { type: Boolean, default: false },
+    deviceToken: { type: Array, default: [] }
 }, { timestamps: true });
 exports.userModel = mongoose.model('user', userSchema);
 //# sourceMappingURL=user.js.map

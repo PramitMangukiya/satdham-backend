@@ -234,3 +234,40 @@ export const resend_otp = async (req: Request, res: Response) => {
     }
 }
 
+export const faculty_login = async (req: Request, res: Response) => { //email and password
+    let body = req.body,
+    {userId , password} = req.body,
+        response: any
+    reqInfo(req)
+    try {
+        console.log(body);
+        response = await userModel.findOneAndUpdate({ userId: userId, password : password ,isActive: true , userType : "faculty" }, { $addToSet: { deviceToken: body?.deviceToken } , isLoggedIn : true }).select('-__v -createdAt -updatedAt')
+        // console.log("userID => ",response.userId);
+        console.log("response => ",response);
+        if (!response) return res.status(400).json(new apiResponse(400, responseMessage?.invalidUserPasswordEmail, {}, {}))
+        
+        const token = jwt.sign({
+            _id: response._id,
+            type: response.userType,
+            status: "Login",
+            generatedOn: (new Date().getTime())
+        }, jwt_token_secret)
+
+        await new userSessionModel({
+            createdBy: response._id,
+        }).save()
+        response = {
+            isUserIdVerified: response?.isUserIdVerified,
+            userType: response?.userType,
+            _id: response?._id,
+            userId: response?.userId,
+            token,
+        }
+        return res.status(200).json(new apiResponse(200, responseMessage?.loginSuccess, response, {}))
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
+

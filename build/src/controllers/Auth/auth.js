@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resend_otp = exports.reset_password = exports.forgot_password = exports.login = exports.otp_verification = exports.signUp = void 0;
+exports.faculty_login = exports.resend_otp = exports.reset_password = exports.forgot_password = exports.login = exports.otp_verification = exports.signUp = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const database_1 = require("../../database");
@@ -238,4 +238,38 @@ const resend_otp = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.resend_otp = resend_otp;
+const faculty_login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let body = req.body, { userId, password } = req.body, response;
+    (0, helper_1.reqInfo)(req);
+    try {
+        console.log(body);
+        response = yield database_1.userModel.findOneAndUpdate({ userId: userId, password: password, isActive: true, userType: "faculty" }, { $addToSet: { deviceToken: body === null || body === void 0 ? void 0 : body.deviceToken }, isLoggedIn: true }).select('-__v -createdAt -updatedAt');
+        // console.log("userID => ",response.userId);
+        console.log("response => ", response);
+        if (!response)
+            return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.invalidUserPasswordEmail, {}, {}));
+        const token = jsonwebtoken_1.default.sign({
+            _id: response._id,
+            type: response.userType,
+            status: "Login",
+            generatedOn: (new Date().getTime())
+        }, jwt_token_secret);
+        yield new database_1.userSessionModel({
+            createdBy: response._id,
+        }).save();
+        response = {
+            isUserIdVerified: response === null || response === void 0 ? void 0 : response.isUserIdVerified,
+            userType: response === null || response === void 0 ? void 0 : response.userType,
+            _id: response === null || response === void 0 ? void 0 : response._id,
+            userId: response === null || response === void 0 ? void 0 : response.userId,
+            token,
+        };
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.loginSuccess, response, {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.faculty_login = faculty_login;
 //# sourceMappingURL=auth.js.map

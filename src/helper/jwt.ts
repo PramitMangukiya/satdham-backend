@@ -49,7 +49,11 @@ export const adminJWT = async (req: Request, res: Response, next) => {
     if (authorization) {
         try {
             let isVerifyToken = jwt.verify(authorization, jwt_token_secret)
+            console.log(isVerifyToken);
             result = await userModel.findOne({ _id: ObjectId(isVerifyToken?._id), isActive: true , userType : "admin" })
+            if(!result)
+            result = await userModel.findOne({ _id: ObjectId(isVerifyToken?._id), isActive: true , userType : "faculty" })
+            console.log(result);
             if (result?.isBlock == true) return res.status(403).json(new apiResponse(403, 'Your account han been blocked.', {}, {}));
             if (result?.isActive == true && isVerifyToken.authToken == result.authToken && isVerifyToken.type == result.userType) {
                 // Set in Header Decode Token Information
@@ -71,7 +75,7 @@ export const adminJWT = async (req: Request, res: Response, next) => {
 export const uploadJWT = async (req: Request, res: Response, next) => {
     let { authorization, userType } = req.headers,
         result: any
-    if (authorization) {
+    if (authorization) { 
         try {
             let isVerifyToken = jwt.verify(authorization, jwt_token_secret)
             result = await userModel.findOne({ _id: ObjectId(isVerifyToken._id), isActive: true });

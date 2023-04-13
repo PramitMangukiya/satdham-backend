@@ -65,7 +65,11 @@ const adminJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     if (authorization) {
         try {
             let isVerifyToken = jsonwebtoken_1.default.verify(authorization, jwt_token_secret);
+            console.log(isVerifyToken);
             result = yield database_1.userModel.findOne({ _id: ObjectId(isVerifyToken === null || isVerifyToken === void 0 ? void 0 : isVerifyToken._id), isActive: true, userType: "admin" });
+            if (!result)
+                result = yield database_1.userModel.findOne({ _id: ObjectId(isVerifyToken === null || isVerifyToken === void 0 ? void 0 : isVerifyToken._id), isActive: true, userType: "faculty" });
+            console.log(result);
             if ((result === null || result === void 0 ? void 0 : result.isBlock) == true)
                 return res.status(403).json(new common_1.apiResponse(403, 'Your account han been blocked.', {}, {}));
             if ((result === null || result === void 0 ? void 0 : result.isActive) == true && isVerifyToken.authToken == result.authToken && isVerifyToken.type == result.userType) {

@@ -4,6 +4,7 @@ import { Request, Router, Response } from 'express'
 import { userStatus } from '../common'
 import { adminRouter } from './admin'
 import { uploadRouter } from './upload'
+import { facultyRouter } from './faculty'
 // import { userRouter } from './user'
 
 
@@ -13,8 +14,11 @@ const accessControl = (req: Request, res: Response, next: any) => {
     req.headers.userType = userStatus[req.originalUrl.split('/')[1]]
     next();
 }
-router.use('/admin',  accessControl, adminRouter)
+console.log("hiii")
 router.use("/upload" , accessControl ,uploadRouter )
+router.use('/admin',  accessControl, adminRouter)
+router.use('/faculty',  accessControl, facultyRouter)
+console.log("hiii")
 
 
 export { router }
