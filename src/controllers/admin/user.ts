@@ -17,7 +17,6 @@ export const add_user = async (req: Request, res: Response) => {
         //if in one class same roll no is present then ?
         if((!body?.userType) || body.userType != "faculty")
         {
-
             prefix = "U"; //setted prefix as a user
             const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
