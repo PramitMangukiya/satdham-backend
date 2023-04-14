@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.editUser = void 0;
+exports.edit_faculty = void 0;
 const database_1 = require("../../database");
 const helper_1 = require("../../helper");
 const common_1 = require("../../common");
 const ObjectId = require("mongoose").Types.ObjectId;
-const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const edit_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     (0, helper_1.reqInfo)(req);
     let body = req.body, { _id, attendance } = req.body, { user } = req.headers;
     try {
@@ -28,5 +28,5 @@ const editUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
     }
 });
-exports.editUser = editUser;
+exports.edit_faculty = edit_faculty;
 //# sourceMappingURL=faculty.js.map
