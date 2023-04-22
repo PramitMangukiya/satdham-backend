@@ -19,7 +19,7 @@ export const add_offline_fees = async (req: Request, res: Response) => {
       //step 2 usermodel pending fees update
 
       //step 0 
-      let userData = await userModel.findOne({_id : ObjectId(userId) ,pendingFees : {$lte : totalAmount}  })
+      let userData = await userModel.findOne({_id : ObjectId(userId) ,pendingFees : {$gte : totalAmount}  })
   
       if(!userData)   return res.status(400).json(new apiResponse(400, "Total amount should be less than pending fees", {}, {}))
 

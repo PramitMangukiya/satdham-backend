@@ -24,7 +24,7 @@ const add_offline_fees = (req, res) => __awaiter(void 0, void 0, void 0, functio
         //step 1 transactionModel data add
         //step 2 usermodel pending fees update
         //step 0 
-        let userData = yield database_1.userModel.findOne({ _id: ObjectId(userId), pendingFees: { $lte: totalAmount } });
+        let userData = yield database_1.userModel.findOne({ _id: ObjectId(userId), pendingFees: { $gte: totalAmount } });
         if (!userData)
             return res.status(400).json(new common_1.apiResponse(400, "Total amount should be less than pending fees", {}, {}));
         const response = yield transaction_1.transactionModel.create({ userId: ObjectId(userId), feesDetails: feesDetails, totalAmount: totalAmount, isActive: true, });
