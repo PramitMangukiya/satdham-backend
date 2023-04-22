@@ -18,7 +18,7 @@ export const add_user = async (req: Request, res: Response) => {
         if((!body?.userType) || body.userType != "faculty")
         {
             prefix = "U"; //setted prefix as a user
-            const isExist = await userModel.findOne({isActive : true , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
+            const isExist = await userModel.findOne({isActive : true ,standard : ObjectId(body?.standard) , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
 
              //(pending)standard pramane fees attach karvani - done
@@ -381,6 +381,69 @@ export const get_all_faculty = async (req, res) => {
             }
         }, {}))
     } catch (error) {
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+    }
+}
+
+
+export const add_student_in_bulk = async (req: Request, res: Response) => {
+    reqInfo(req);
+    let { students } = req.body, //{question , options , ans }
+        body = req.body ,
+        {user} : any = req.headers,
+        prefix ; //prefix for user U and for faculty F
+    try {
+
+        let addedDataCount = 0 ,
+         skippedDataCount = 0 ,
+         skippedData = []
+        for(let individual of students)
+        {
+                //assign userId and password
+                let userId : any = null , password :any ;
+            
+                //if standard is number then we have to fetch standard here from standard number
+                let standardData = await standardModel.findOne({isActive : true  , number : individual.standard});
+                if(!standardData) {
+                    skippedDataCount ++ ;
+                    skippedData.push( { ...individual , reason :"Standard does not exist! please add standard first!"} );
+                    continue;
+                }
+
+                prefix = "U"; //setted prefix as a user
+                const isExist = await userModel.findOne({isActive : true ,standard : ObjectId(standardData) , rollNo : individual.rollNo ,class : individual.class ,userType : "user"  })
+                if(isExist) {
+                    skippedDataCount ++ ;
+                    skippedData.push( { ...individual , reason :"student with same roll no and class exist!"} );
+                    continue;
+                }
+                // return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+
+                //(pending)standard pramane fees attach karvani - done
+                individual.standard = ObjectId(standardData?._id);
+                // const standard = await standardModel.findOne({_id: ObjectId(individual?.standard) , isActive : true});
+
+                // individual.installments = standard?.installments
+                individual.totalFees = standardData?.fees || 0;
+                individual.pendingFees = standardData?.fees || 0;
+    
+                while(!userId){
+                    let temp = generateUserId(prefix);
+                const copy =  await userModel.findOne({userId : temp , isActive : true ,userType : "user"});
+                if(!copy) userId = temp;
+                }
+                individual.userId = userId;
+                if(!individual.password) individual.password = generatePassword();
+
+                const response = await new userModel(individual).save();
+                addedDataCount++;
+        }   
+        
+         return res.status(200).json(new apiResponse(200 , responseMessage?.addDataSuccess("students") , {totalData : students.length ,addedDataCount ,skippedDataCount , skippedData} , {}));
+         return res.status(400).json(new apiResponse(400, responseMessage?.addDataError, {}, {}))
+
+    } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
