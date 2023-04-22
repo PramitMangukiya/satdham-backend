@@ -1,6 +1,6 @@
 "use strict"
 import { Router } from 'express'
-import { uploadJWT, userJWT } from '../helper/jwt'
+import { uploadJWT } from '../helper/jwt'
 import { compress_image, image_compress_response, delete_file, uploadS3 } from '../helper/s3'
 import { apiResponse, file_path } from '../common'
 import { Request, Response } from 'express'

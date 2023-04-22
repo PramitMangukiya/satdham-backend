@@ -243,7 +243,7 @@ export const faculty_login = async (req: Request, res: Response) => { //email an
         console.log(body);
         response = await userModel.findOneAndUpdate({ userId: userId, password : password ,isActive: true , userType : "faculty" }, { $addToSet: { deviceToken: body?.deviceToken } , isLoggedIn : true }).select('-__v -createdAt -updatedAt')
         // console.log("userID => ",response.userId);
-        console.log("response => ",response);
+        // console.log("response => ",response);
         if (!response) return res.status(400).json(new apiResponse(400, responseMessage?.invalidUserPasswordEmail, {}, {}))
         
         const token = jwt.sign({

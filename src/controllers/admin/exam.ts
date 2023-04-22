@@ -146,9 +146,9 @@ export const get_by_id_exam = async(req,res)=>
         reqInfo(req);
         let { exam } = req.headers,
             body = req.body,
-          { id } = req.params;
+            { id } = req.params;
         try {
-            const response = await examModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("standard").lean();
+        const response = await examModel.findOne({ _id : ObjectId(id) , isActive : true}).populate("standard").lean();
 
             // let registerStudents= await examStudentModel.find({examId : ObjectId(response?._id)})
                                                         // .populate({
@@ -158,11 +158,11 @@ export const get_by_id_exam = async(req,res)=>
                                                         //   });
 
             // console.log(registerStudents[0] , "student log");
-            if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("exam"), {}, {}));
-            return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("exam"), response, {}));
+        if (!response) return res.status(400).json(new apiResponse(400, responseMessage.getDataNotFound("exam"), {}, {}));
+        return res.status(200).json(new apiResponse(200, responseMessage.getDataSuccess("exam"), response, {}));
         } catch (error) {
-            console.log(error);
-            return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
+        console.log(error);
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
 }}
 
 export const edit_or_add_exam_marks_of_student = async(req,res) =>

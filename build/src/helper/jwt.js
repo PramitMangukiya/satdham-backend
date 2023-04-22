@@ -12,54 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadJWT = exports.adminJWT = exports.userJWT = void 0;
+exports.uploadJWT = exports.adminJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // import { userModel } from '../database'
 const mongoose_1 = __importDefault(require("mongoose"));
 const common_1 = require("../common");
-const response_1 = require("./response");
 const database_1 = require("../database");
 const ObjectId = mongoose_1.default.Types.ObjectId;
 const jwt_token_secret = process.env.JWT_TOKEN_SECRET;
-const userJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    let { authorization, userType } = req.headers, result;
-    if (authorization) {
-        try {
-            let isVerifyToken = jsonwebtoken_1.default.verify(authorization, jwt_token_secret);
-            if ((isVerifyToken === null || isVerifyToken === void 0 ? void 0 : isVerifyToken.type) != userType && userType != "5")
-                return res.status(403).json(new common_1.apiResponse(403, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.accessDenied, {}, {}));
-            if (((_a = process === null || process === void 0 ? void 0 : process.env) === null || _a === void 0 ? void 0 : _a.NODE_ENV) == 'production') {
-                // 1 day expiration
-                if (parseInt(isVerifyToken.generatedOn + 86400000) < new Date().getTime()) {
-                    // if (parseInt(isVerifyToken.generatedOn + 120000) < new Date().getTime()) {
-                    return res.status(410).json(new common_1.apiResponse(410, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.tokenExpire, {}, {}));
-                }
-            }
-            // result = await userModel.findOne({ _id: ObjectId(isVerifyToken._id), isActive: true })
-            if ((result === null || result === void 0 ? void 0 : result.isBlock) == false)
-                return res.status(403).json(new common_1.apiResponse(403, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.accountBlock, {}, {}));
-            if ((result === null || result === void 0 ? void 0 : result.isActive) == true && isVerifyToken.authToken == result.authToken) {
-                // Set in Header Decode Token Information
-                req.headers.user = result;
-                return next();
-            }
-            else {
-                return res.status(401).json(new common_1.apiResponse(401, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.invalidToken, {}, {}));
-            }
-        }
-        catch (err) {
-            if (err.message == "invalid signature")
-                return res.status(403).json(new common_1.apiResponse(403, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.differentToken, {}, {}));
-            console.log(err);
-            return res.status(401).json(new common_1.apiResponse(401, response_1.responseMessage.invalidToken, {}, {}));
-        }
-    }
-    else {
-        return res.status(401).json(new common_1.apiResponse(401, response_1.responseMessage === null || response_1.responseMessage === void 0 ? void 0 : response_1.responseMessage.tokenNotFound, {}, {}));
-    }
-});
-exports.userJWT = userJWT;
 const adminJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     let { authorization, userType } = req.headers, result;
     if (authorization) {

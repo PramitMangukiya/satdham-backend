@@ -14,11 +14,11 @@ const accessControl = (req: Request, res: Response, next: any) => {
     req.headers.userType = userStatus[req.originalUrl.split('/')[1]]
     next();
 }
-console.log("hiii")
+
 router.use("/upload" , accessControl ,uploadRouter )
 router.use('/admin',  accessControl, adminRouter)
 router.use('/faculty',  accessControl, facultyRouter)
-console.log("hiii")
+
 
 
 export { router }

@@ -245,7 +245,7 @@ const faculty_login = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         console.log(body);
         response = yield database_1.userModel.findOneAndUpdate({ userId: userId, password: password, isActive: true, userType: "faculty" }, { $addToSet: { deviceToken: body === null || body === void 0 ? void 0 : body.deviceToken }, isLoggedIn: true }).select('-__v -createdAt -updatedAt');
         // console.log("userID => ",response.userId);
-        console.log("response => ", response);
+        // console.log("response => ",response);
         if (!response)
             return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.invalidUserPasswordEmail, {}, {}));
         const token = jsonwebtoken_1.default.sign({

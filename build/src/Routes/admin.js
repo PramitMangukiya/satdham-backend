@@ -68,5 +68,8 @@ router.get("/exam/:id", controllers_1.adminController.get_by_id_exam);
 router.post("/exam/marks/edit", controllers_1.adminController.edit_or_add_exam_marks_of_student);
 router.post("/exam/get/students/all", controllers_1.adminController.get_registered_student_by_exam_id);
 router.get("/exam/marks/:id", controllers_1.adminController.get_by_id_student_exam);
+//------------------------ Transaction --------------------------------------
+router.post("/transaction/add", controllers_1.adminController.add_offline_fees);
+router.post("/transaction/get/all", controllers_1.adminController.get_all_transactions);
 exports.adminRouter = router;
 //# sourceMappingURL=admin.js.map
