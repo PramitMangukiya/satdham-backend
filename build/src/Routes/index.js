@@ -7,6 +7,7 @@ const common_1 = require("../common");
 const admin_1 = require("./admin");
 const upload_1 = require("./upload");
 const faculty_1 = require("./faculty");
+const user_1 = require("./user");
 // import { userRouter } from './user'
 const router = (0, express_1.Router)();
 exports.router = router;
@@ -17,4 +18,5 @@ const accessControl = (req, res, next) => {
 router.use("/upload", accessControl, upload_1.uploadRouter);
 router.use('/admin', accessControl, admin_1.adminRouter);
 router.use('/faculty', accessControl, faculty_1.facultyRouter);
+router.use('/user', accessControl, user_1.userRouter);
 //# sourceMappingURL=index.js.map

@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadJWT = exports.adminJWT = void 0;
+exports.userJWT = exports.uploadJWT = exports.adminJWT = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 // import { userModel } from '../database'
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -84,4 +84,32 @@ const uploadJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.uploadJWT = uploadJWT;
+const userJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    let { authorization } = req.headers, response;
+    if (authorization) {
+        try {
+            let isVerifyToken = jsonwebtoken_1.default.verify(authorization, jwt_token_secret);
+            response = yield database_1.userModel.findOne({ _id: ObjectId(isVerifyToken._id), isActive: true });
+            if ((response === null || response === void 0 ? void 0 : response.isBlock) == true)
+                return res.status(403).json(new common_1.apiResponse(403, "Your account has been blocked.", {}, {}));
+            if ((response === null || response === void 0 ? void 0 : response.isActive) == true && isVerifyToken.type == response.userType) {
+                req.headers.user = response;
+                return next();
+            }
+            else {
+                return res.status(401).json(new common_1.apiResponse(401, "Invalid Token", {}, {}));
+            }
+        }
+        catch (error) {
+            if (error.message == "invalid signature")
+                return res.status(403).json(new common_1.apiResponse(403, "Don't try different one token", {}, {}));
+            console.log(error);
+            return res.status(401).json(new common_1.apiResponse(401, "Invalid Token", {}, {}));
+        }
+    }
+    else {
+        return res.status(401).json(new common_1.apiResponse(401, "Token not found in header", {}, {}));
+    }
+});
+exports.userJWT = userJWT;
 //# sourceMappingURL=jwt.js.map

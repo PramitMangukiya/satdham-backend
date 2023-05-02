@@ -11,6 +11,7 @@ const transactionSchema = new mongoose.Schema({
         }
     ],
     totalAmount: { type: Number },
+    type: { type: String, enum: ["offline", "online"], default: "offline" },
     isActive: { type: Boolean, default: true }
 }, { timestamps: true });
 exports.transactionModel = mongoose.model('transaction', transactionSchema);

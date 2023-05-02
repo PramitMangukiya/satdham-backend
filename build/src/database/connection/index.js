@@ -10,5 +10,6 @@ const express_1 = __importDefault(require("express"));
 const dbUrl = process.env.DB_URL;
 const mongooseConnection = (0, express_1.default)();
 exports.mongooseConnection = mongooseConnection;
+mongoose_1.default.set('strictQuery', true);
 mongoose_1.default.connect(dbUrl).then(() => console.log('Database successfully connected')).catch(err => console.log(err));
 //# sourceMappingURL=index.js.map

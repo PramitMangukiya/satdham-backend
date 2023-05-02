@@ -2,3 +2,4 @@
 export * as authController from "./Auth"
 export * as adminController from "./admin"
 export * as facultyController from "./faculty"
+export * as userController from "./user"

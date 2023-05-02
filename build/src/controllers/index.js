@@ -23,9 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.facultyController = exports.adminController = exports.authController = void 0;
+exports.userController = exports.facultyController = exports.adminController = exports.authController = void 0;
 // export * as userController from './user/index'
 exports.authController = __importStar(require("./Auth"));
 exports.adminController = __importStar(require("./admin"));
 exports.facultyController = __importStar(require("./faculty"));
+exports.userController = __importStar(require("./user"));
 //# sourceMappingURL=index.js.map

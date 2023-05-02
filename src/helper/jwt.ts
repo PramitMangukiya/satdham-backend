@@ -67,3 +67,28 @@ export const uploadJWT = async (req: Request, res: Response, next) => {
         return res.status(401).json(new apiResponse(401, "Token not found in header", {}, {}))
     }
 }
+
+export const userJWT = async (req:Request, res:Response, next) =>{
+    let{authorization} = req.headers,
+    response:any
+        if(authorization){
+            try{
+                let isVerifyToken = jwt.verify(authorization, jwt_token_secret)
+                response = await userModel.findOne({_id:ObjectId(isVerifyToken._id), isActive:true })
+                if(response?.isBlock == true) return res.status(403).json(new apiResponse(403, "Your account has been blocked.",{},{}))
+                if(response?.isActive == true && isVerifyToken.type == response.userType){
+                    req.headers.user = response
+                    return next();
+                }else{
+                    return res.status(401).json(new apiResponse(401, "Invalid Token",{},{}))
+                }
+                    
+            }catch(error){
+                if(error.message == "invalid signature") return res.status(403).json(new apiResponse(403, "Don't try different one token",{},{}))
+                console.log(error);
+                return res.status(401).json(new apiResponse(401, "Invalid Token",{},{}));
+            }
+        }else{
+            return res.status(401).json(new apiResponse(401, "Token not found in header",{},{}))
+        }
+}
