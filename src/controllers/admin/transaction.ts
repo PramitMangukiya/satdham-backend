@@ -101,8 +101,33 @@ export const get_all_transactions =async (req, res) => {
                     }
                 },
                 {
-                  $project : {firstName : 1 , lastName : 1 , middleName : 1 , rollNo : 1 , standard : 1 , class : 1 }
+                  $project : {firstName : 1 , lastName : 1 , middleName : 1 , rollNo : 1 , standard : 1 , class : 1  , profilePhoto : 1 }
+                },
+                {
+                  $lookup: {
+                      from: "standards",
+                      let: { stdId: '$standard' },
+                      pipeline: [
+                          {
+                              $match: {
+                                  $expr: {
+                                      $and: [
+                                          { $eq: ['$_id', '$$stdId'] },
+                                      ],
+                                  },
+                              }
+                          },
+                          {$project : {name : 1 , number : 1}}
+                      ],
+                      as: "standard"
+                  }
+              },
+              {
+                $unwind: {
+                  path: "$standard",
+                  preserveNullAndEmptyArrays: true
                 }
+              },
             ],
             as: "user"
         }

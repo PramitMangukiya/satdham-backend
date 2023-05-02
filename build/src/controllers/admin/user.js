@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_all_faculty = exports.get_user_attendance = exports.get_by_id_user = exports.get_all_user = exports.delete_user_by_id = exports.edit_user_by_id = exports.add_user = void 0;
+exports.add_student_in_bulk = exports.get_all_faculty = exports.get_user_attendance = exports.get_by_id_user = exports.get_all_user = exports.delete_user_by_id = exports.edit_user_by_id = exports.add_user = void 0;
 const common_1 = require("../../common");
 const database_1 = require("../../database");
 const helper_1 = require("../../helper");
@@ -24,7 +24,7 @@ const add_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         //if in one class same roll no is present then ?
         if ((!(body === null || body === void 0 ? void 0 : body.userType)) || body.userType != "faculty") {
             prefix = "U"; //setted prefix as a user
-            const isExist = yield database_1.userModel.findOne({ isActive: true, rollNo: body.rollNo, class: body.class, userType: "user", });
+            const isExist = yield database_1.userModel.findOne({ isActive: true, standard: ObjectId(body === null || body === void 0 ? void 0 : body.standard), rollNo: body.rollNo, class: body.class, userType: "user", });
             if (isExist)
                 return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.dataAlreadyExist("Roll no"), {}, {}));
             //(pending)standard pramane fees attach karvani - done
@@ -363,4 +363,55 @@ const get_all_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.get_all_faculty = get_all_faculty;
+const add_student_in_bulk = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, helper_1.reqInfo)(req);
+    let { students } = req.body, //{question , options , ans }
+    body = req.body, { user } = req.headers, prefix; //prefix for user U and for faculty F
+    try {
+        let addedDataCount = 0, skippedDataCount = 0, skippedData = [];
+        for (let individual of students) {
+            //assign userId and password
+            let userId = null, password;
+            //if standard is number then we have to fetch standard here from standard number
+            let standardData = yield database_1.standardModel.findOne({ isActive: true, number: individual.standard });
+            if (!standardData) {
+                skippedDataCount++;
+                skippedData.push(Object.assign(Object.assign({}, individual), { reason: "Standard does not exist! please add standard first!" }));
+                continue;
+            }
+            prefix = "U"; //setted prefix as a user
+            const isExist = yield database_1.userModel.findOne({ isActive: true, standard: ObjectId(standardData), rollNo: individual.rollNo, class: individual.class, userType: "user" });
+            if (isExist) {
+                skippedDataCount++;
+                skippedData.push(Object.assign(Object.assign({}, individual), { reason: "student with same roll no and class exist!" }));
+                continue;
+            }
+            // return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+            //(pending)standard pramane fees attach karvani - done
+            individual.standard = ObjectId(standardData === null || standardData === void 0 ? void 0 : standardData._id);
+            // const standard = await standardModel.findOne({_id: ObjectId(individual?.standard) , isActive : true});
+            // individual.installments = standard?.installments
+            individual.totalFees = (standardData === null || standardData === void 0 ? void 0 : standardData.fees) || 0;
+            individual.pendingFees = (standardData === null || standardData === void 0 ? void 0 : standardData.fees) || 0;
+            while (!userId) {
+                let temp = (0, common_1.generateUserId)(prefix);
+                const copy = yield database_1.userModel.findOne({ userId: temp, isActive: true, userType: "user" });
+                if (!copy)
+                    userId = temp;
+            }
+            individual.userId = userId;
+            if (!individual.password)
+                individual.password = (0, common_1.generatePassword)();
+            const response = yield new database_1.userModel(individual).save();
+            addedDataCount++;
+        }
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.addDataSuccess("students"), { totalData: students.length, addedDataCount, skippedDataCount, skippedData }, {}));
+        return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.addDataError, {}, {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.add_student_in_bulk = add_student_in_bulk;
 //# sourceMappingURL=user.js.map
