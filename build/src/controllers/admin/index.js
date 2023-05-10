@@ -24,4 +24,5 @@ __exportStar(require("./canteen"), exports);
 __exportStar(require("./transportation"), exports);
 __exportStar(require("./exam"), exports);
 __exportStar(require("./transaction"), exports);
+__exportStar(require("./timetable"), exports);
 //# sourceMappingURL=index.js.map

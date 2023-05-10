@@ -18,6 +18,15 @@ export const userStatus = {
     upload: "upload"
 }
 
+export const standardClass = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F"
+]
+
 export const file_path = ['profile', 'document']
 
 

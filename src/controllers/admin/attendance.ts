@@ -86,7 +86,7 @@ export const get_attendance_by_date_std_subject = async (req, res) => {
             // console.log("student Data" , studentData);
         
 
-            let subjects = standardData.subjects;
+            let subjects = standardData.subjects;//take out subject from timetableModel(std id and class)
             // console.log(subjects);
             let preAttendance : any = {};
 

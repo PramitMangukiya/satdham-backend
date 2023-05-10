@@ -108,6 +108,6 @@ export const get_by_id_transportation = async(req,res)=>
         } catch (error) {
             console.log(error);
             return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
-}
+    }
 }
 

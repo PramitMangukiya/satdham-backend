@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMonthEndDate = exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.userStatus = exports.apiResponse = void 0;
+exports.getMonthEndDate = exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.standardClass = exports.userStatus = exports.apiResponse = void 0;
 class apiResponse {
     constructor(status, message, data, error) {
         this.status = status;
@@ -15,6 +15,14 @@ exports.userStatus = {
     admin: "admin",
     upload: "upload"
 };
+exports.standardClass = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F"
+];
 exports.file_path = ['profile', 'document'];
 const generateUserId = (prefix) => {
     const randomInt = Math.floor(Math.random() * 100000); // Generate a random integer between 0 and 99999

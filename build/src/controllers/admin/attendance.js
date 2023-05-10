@@ -84,7 +84,7 @@ const get_attendance_by_date_std_subject = (req, res) => __awaiter(void 0, void 
             }
             console.log((_a = studentData[0]) === null || _a === void 0 ? void 0 : _a.attendance, "is field attendance");
             // console.log("student Data" , studentData);
-            let subjects = standardData.subjects;
+            let subjects = standardData.subjects; //take out subject from timetableModel(std id and class)
             // console.log(subjects);
             let preAttendance = {};
             for (let i = 0; i < (subjects === null || subjects === void 0 ? void 0 : subjects.length); i++) {

@@ -72,5 +72,8 @@ router.get("/exam/marks/:id", controllers_1.adminController.get_by_id_student_ex
 //------------------------ Transaction --------------------------------------
 router.post("/transaction/add", controllers_1.adminController.add_offline_fees);
 router.post("/transaction/get/all", controllers_1.adminController.get_all_transactions);
+//------------------------ Timetable --------------------------------------
+router.post("/timetable/add", controllers_1.adminController.add_edit_timetable);
+router.post("/timetable/get", controllers_1.adminController.get_by_id_timetable);
 exports.adminRouter = router;
 //# sourceMappingURL=admin.js.map

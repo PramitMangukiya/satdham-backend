@@ -5,45 +5,6 @@ const standardSchema: any = new mongoose.Schema({
     number : { type : Number},
     fees : {type : Number},
     subjects : [{type : String}],
-    
-    timetable : {   
-        monday : [ //total 8 slot will be there
-            {
-                subject : {type : String} , 
-                faculty :  { type : String},
-            }
-        ] ,
-        tuesday : [ //total 8 slot will be there
-            {
-                subject : {type : String} , 
-                faculty :  { type : String},
-            }
-        ] ,
-        wednesday : [ //total 8 slot will be there
-        {
-            subject : {type : String} , 
-            faculty :  { type : String},
-        }
-         ] ,
-        thursday : [ //total 8 slot will be there
-        {
-            subject : {type : String} , 
-            faculty :  { type : String},
-        }
-        ] ,
-        friday : [ //total 8 slot will be there
-        {
-            subject : {type : String} , 
-            faculty :  { type : String},
-        }
-        ] ,
-        saturday : [ //total 8 slot will be there
-        {
-            subject : {type : String} , 
-            faculty :  { type : String},
-        }
-        ] ,
-    },
 
     features : [
         {

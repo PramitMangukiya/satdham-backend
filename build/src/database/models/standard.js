@@ -7,44 +7,6 @@ const standardSchema = new mongoose.Schema({
     number: { type: Number },
     fees: { type: Number },
     subjects: [{ type: String }],
-    timetable: {
-        monday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-        tuesday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-        wednesday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-        thursday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-        friday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-        saturday: [
-            {
-                subject: { type: String },
-                faculty: { type: String },
-            }
-        ],
-    },
     features: [
         {
             type: { type: String },

@@ -25,4 +25,5 @@ __exportStar(require("./transportation"), exports);
 __exportStar(require("./exam"), exports);
 __exportStar(require("./transaction"), exports);
 __exportStar(require("./order"), exports);
+__exportStar(require("./timetable"), exports);
 //# sourceMappingURL=index.js.map

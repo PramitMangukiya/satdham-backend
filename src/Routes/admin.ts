@@ -85,7 +85,9 @@ router.get("/exam/marks/:id" , adminController.get_by_id_student_exam);
 router.post("/transaction/add",adminController.add_offline_fees);
 router.post("/transaction/get/all",adminController.get_all_transactions);
 
+//------------------------ Timetable --------------------------------------
 
-
+router.post("/timetable/add", adminController.add_edit_timetable)
+router.post("/timetable/get", adminController.get_by_id_timetable)
 
 export const adminRouter = router
