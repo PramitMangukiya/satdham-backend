@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { apiResponse, get_next_Date } from "../../common";
-import { attendanceModel, standardModel, userModel } from "../../database";
+import { apiResponse, getDayOfWeek, get_next_Date } from "../../common";
+import { attendanceModel, standardModel, timetableModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 
 const ObjectId = require('mongoose').Types.ObjectId
@@ -54,7 +54,7 @@ export const add_edit_attendance = async (req: Request, res: Response) => {
 
 export const get_attendance_by_date_std_subject = async (req, res) => {
     reqInfo(req)
-    let response: any, { standard , date , subject} = req.body, match: any = {};
+    let response: any, { standard , date , subject , classId } = req.body, match: any = {};
     try {
         match.isActive = true
         match.date = { $gt : get_next_Date(new Date(date) , -1), $lte : new Date(date) };
@@ -64,9 +64,10 @@ export const get_attendance_by_date_std_subject = async (req, res) => {
         if(!attendance)
         {
             //then make new attendance entry in that 
-            let standardData = await standardModel.findOne({_id : ObjectId(standard) , isActive : true});
+            // let standardData = await standardModel.findOne({_id : ObjectId(standard) , isActive : true});
 
-            let studentData = await userModel.find({isActive : true , userType : "user" , standard : ObjectId(standard)});
+            console.log("studentData" , "stuData");
+            let studentData = await userModel.find({isActive : true , userType : "user" , standard : ObjectId(standard) , class : classId});
             let responseStudentData  : any = [];
             for(let i = 0 ; i < studentData?.length ; i++)
             {
@@ -84,10 +85,29 @@ export const get_attendance_by_date_std_subject = async (req, res) => {
             
             console.log(studentData[0]?.attendance , "is field attendance");
             // console.log("student Data" , studentData);
-        
 
-            let subjects = standardData.subjects;//take out subject from timetableModel(std id and class)
-            // console.log(subjects);
+            let subjects = []; // change here subjects as per timetable
+
+            let day = getDayOfWeek(date);
+            console.log(day , "day");
+
+            let timetable = await timetableModel.findOne({standardId : ObjectId(standard) , class : classId }).lean();
+
+            timetable = timetable.timetable;
+
+            console.log("timetable" , timetable);
+
+            let  tempSubjects = timetable[day];
+
+            console.log("temp subjects" ,  tempSubjects);
+
+            for(let sub of tempSubjects)
+            {
+                subjects.push(sub.subject);
+            }
+
+            console.log("final subjects" , subjects);
+      
             let preAttendance : any = {};
 
             for(let i = 0 ; i < subjects?.length ; i ++)
@@ -99,6 +119,7 @@ export const get_attendance_by_date_std_subject = async (req, res) => {
             let new_attendance = {
                 standard : ObjectId(standard),
                 date : new Date(date),
+                class : classId ,
                 attendance : preAttendance
             }
             const attendanceData = await new attendanceModel(new_attendance).save()

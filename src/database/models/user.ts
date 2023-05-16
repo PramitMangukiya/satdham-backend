@@ -1,3 +1,5 @@
+import { standardClass } from "../../common";
+
 const mongoose = require('mongoose')
 
 const userSchema: any = new mongoose.Schema({
@@ -36,7 +38,7 @@ const userSchema: any = new mongoose.Schema({
     
     rollNo : {type : String},
     standard : {type : mongoose.Schema.Types.ObjectId , ref : "standard"},
-    class :  {type : String},
+    class :  {type : String ,enum :standardClass},
 
     email: { type: String },
     phoneNumber: { type: String},

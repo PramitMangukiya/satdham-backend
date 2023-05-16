@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userModel = void 0;
+const common_1 = require("../../common");
 const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     //----------------------------- User details -------------------------------
@@ -34,7 +35,7 @@ const userSchema = new mongoose.Schema({
     zipCode: { type: String },
     rollNo: { type: String },
     standard: { type: mongoose.Schema.Types.ObjectId, ref: "standard" },
-    class: { type: String },
+    class: { type: String, enum: common_1.standardClass },
     email: { type: String },
     phoneNumber: { type: String },
     userId: { type: String },

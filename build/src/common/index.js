@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMonthEndDate = exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.standardClass = exports.userStatus = exports.apiResponse = void 0;
+exports.getDayOfWeek = exports.getMonthEndDate = exports.get_next_Date = exports.generatePassword = exports.generateUserId = exports.file_path = exports.standardClass = exports.userStatus = exports.apiResponse = void 0;
 class apiResponse {
     constructor(status, message, data, error) {
         this.status = status;
@@ -60,4 +60,11 @@ const getMonthEndDate = (monthSDate) => {
     return lastDay;
 };
 exports.getMonthEndDate = getMonthEndDate;
+const getDayOfWeek = (dateString) => {
+    const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+    const date = new Date(dateString);
+    const dayOfWeek = daysOfWeek[date.getUTCDay()];
+    return dayOfWeek;
+};
+exports.getDayOfWeek = getDayOfWeek;
 //# sourceMappingURL=index.js.map

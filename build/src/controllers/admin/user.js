@@ -284,11 +284,11 @@ const get_user_attendance = (req, res) => __awaiter(void 0, void 0, void 0, func
         // console.log("monthSDate" , new Date(monthStartDate));
         // console.log("monthEDate" , new Date(monthEndDate));
         match.date = { $gte: monthStartDate, $lte: monthEndDate };
-        let response = yield database_1.attendanceModel.find(Object.assign(Object.assign({}, match), { isActive: true }));
+        let response = yield database_1.attendanceModel.find(Object.assign(Object.assign({}, match), { isActive: true })).lean();
         const responseAttendance = []; // [ {date , attendance : { guj : true , phy : false }}]
         // response = response?._doc
         // console.log(response);
-        for (let day of response) {
+        for (let day of response) { //each day attendance
             // console.log(day.date , "date");
             let singleAttendance = {
                 date: day === null || day === void 0 ? void 0 : day.date,
@@ -299,10 +299,17 @@ const get_user_attendance = (req, res) => __awaiter(void 0, void 0, void 0, func
             for (let subject in attendanceData) {
                 const allStudentData = attendanceData[subject]; //means [] containing all data
                 //now iterate over that data to find our user and if user is present then send true or false
-                const data = allStudentData.find(item => item._id = ObjectId(id));
-                // console.log("studentStatus" , data);
-                // console.log( , "loaded subject");
-                singleAttendance.attendance[subject] = data.attendance;
+                console.log("object", allStudentData);
+                for (let item of allStudentData) {
+                    if (item._id.toString() == id.toString())
+                        singleAttendance.attendance[subject] = item.attendance;
+                }
+                //     const data = allStudentData.find(item =>
+                //         item._id = ObjectId(id)
+                //         )
+                // // console.log("studentStatus" , data);
+                // // console.log( , "loaded subject");
+                // singleAttendance.attendance[subject] = data.attendance
             }
             responseAttendance.push(singleAttendance);
         }

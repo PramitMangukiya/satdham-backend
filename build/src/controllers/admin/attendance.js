@@ -59,7 +59,7 @@ exports.add_edit_attendance = add_edit_attendance;
 const get_attendance_by_date_std_subject = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     (0, helper_1.reqInfo)(req);
-    let response, { standard, date, subject } = req.body, match = {};
+    let response, { standard, date, subject, classId } = req.body, match = {};
     try {
         match.isActive = true;
         match.date = { $gt: (0, common_1.get_next_Date)(new Date(date), -1), $lte: new Date(date) };
@@ -67,8 +67,9 @@ const get_attendance_by_date_std_subject = (req, res) => __awaiter(void 0, void 
         let attendance = yield database_1.attendanceModel.findOne(Object.assign({}, match));
         if (!attendance) {
             //then make new attendance entry in that 
-            let standardData = yield database_1.standardModel.findOne({ _id: ObjectId(standard), isActive: true });
-            let studentData = yield database_1.userModel.find({ isActive: true, userType: "user", standard: ObjectId(standard) });
+            // let standardData = await standardModel.findOne({_id : ObjectId(standard) , isActive : true});
+            console.log("studentData", "stuData");
+            let studentData = yield database_1.userModel.find({ isActive: true, userType: "user", standard: ObjectId(standard), class: classId });
             let responseStudentData = [];
             for (let i = 0; i < (studentData === null || studentData === void 0 ? void 0 : studentData.length); i++) {
                 let student = studentData[i];
@@ -84,8 +85,18 @@ const get_attendance_by_date_std_subject = (req, res) => __awaiter(void 0, void 
             }
             console.log((_a = studentData[0]) === null || _a === void 0 ? void 0 : _a.attendance, "is field attendance");
             // console.log("student Data" , studentData);
-            let subjects = standardData.subjects; //take out subject from timetableModel(std id and class)
-            // console.log(subjects);
+            let subjects = []; // change here subjects as per timetable
+            let day = (0, common_1.getDayOfWeek)(date);
+            console.log(day, "day");
+            let timetable = yield database_1.timetableModel.findOne({ standardId: ObjectId(standard), class: classId }).lean();
+            timetable = timetable.timetable;
+            console.log("timetable", timetable);
+            let tempSubjects = timetable[day];
+            console.log("temp subjects", tempSubjects);
+            for (let sub of tempSubjects) {
+                subjects.push(sub.subject);
+            }
+            console.log("final subjects", subjects);
             let preAttendance = {};
             for (let i = 0; i < (subjects === null || subjects === void 0 ? void 0 : subjects.length); i++) {
                 let item = subjects[i];
@@ -94,6 +105,7 @@ const get_attendance_by_date_std_subject = (req, res) => __awaiter(void 0, void 
             let new_attendance = {
                 standard: ObjectId(standard),
                 date: new Date(date),
+                class: classId,
                 attendance: preAttendance
             };
             const attendanceData = yield new database_1.attendanceModel(new_attendance).save();

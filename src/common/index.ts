@@ -71,3 +71,10 @@ export const  getMonthEndDate = (monthSDate)=> {
   // Return the last day of the month with the last time (11:59:00 PM)
   return lastDay;
 }
+
+export const getDayOfWeek = (dateString) =>{
+  const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const date = new Date(dateString);
+  const dayOfWeek = daysOfWeek[date.getUTCDay()];
+  return dayOfWeek;
+}
