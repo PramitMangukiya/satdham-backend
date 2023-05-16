@@ -87,7 +87,7 @@ export const edit_user_by_id = async(req,res) =>
         //(pending)standard change then new  pending fees attach karvani
     
         if(data.userType == "faculty"){
-            const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,userType : "faculty"  })
+            const isExist = await userModel.findOne({isActive : true , phoneNumber : body.phoneNumber ,_id:{$ne:ObjectId(body._id)},userType : "faculty"  })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Phone number") , {} , {}));
         }
       
@@ -121,22 +121,34 @@ export const delete_user_by_id = async(req,res) =>
 
 export const get_all_user = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , userTypeFilter , pendingFeesFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , userTypeFilter , pendingFeesFilter, classFilter,cityFilter, areaFilter, countryFilter, standardFilter,
+         stateFilter, districtFilter,zipCodeFilter} = req.body, match: any = {};
     try {
         if (search){
-            var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
-            userIdArray: Array<any> = []
+            var nameArray: Array<any>=[], lastNameArray: Array<any> = [], middleNameArray: Array<any> = [], userIdArray: Array<any> = [],
+            phoneNumberArray: Array<any> = [], standardArray: Array<any> = [], classArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } })
-                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } })
-                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } })
-                userIdArray.push({ userId: { $regex: data, $options: 'si' } })
+                nameArray.push({firstName: {$regex: data, $options:'si'}}),
+                lastNameArray.push({lastName: {$regex: data, $options:'si'}}),
+                middleNameArray.push({middleName: {$regex: data, $options:'si'}}),
+                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } }),
+                userIdArray.push({ userId: { $regex: data, $options: 'si' }})
             })
-            match.$or = [{ $and: firstNameArray }]
+            
+            match.$or = [{ $and: nameArray },{ $and: lastNameArray }, {$and: middleNameArray}, { $and: phoneNumberArray }, 
+                        {$and: standardArray}, {$and: classArray}, {$and : userIdArray}]
         }
         if(userTypeFilter) match.userType = userTypeFilter;
         if(pendingFeesFilter)match.pendingFees = {$gt : 0};
+        if(standardFilter) match.standard = { $regex: standardFilter, $options: 'si' };
+        if(classFilter)match.class = classFilter;
+        if(areaFilter) match.area = areaFilter
+        if(cityFilter) match.city = cityFilter
+        if(countryFilter) match.country = countryFilter
+        if(stateFilter) match.state = stateFilter
+        if(districtFilter) match.district = districtFilter
+        if(zipCodeFilter) match.zipCode = zipCodeFilter
 
         console.log(match);
 
@@ -350,15 +362,18 @@ export const get_all_faculty = async (req, res) => {
     try {
         if (search){
             var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
-            userIdArray: Array<any> = []
+            subjectArray: Array<any> = [], userIdArray: Array<any> = [], standardArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } })
-                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } })
-                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } })
-                userIdArray.push({ userId: { $regex: data, $options: 'si' } })
+                firstNameArray.push({ firstName: { $regex: data, $options: 'si' } }),
+                lastNameArray.push({ lastName: { $regex: data, $options: 'si' } }),
+                phoneNumberArray.push({ phoneNumber: { $regex: data, $options: 'si' } }),
+                userIdArray.push({ userId: { $regex: data, $options: 'si' } }),
+                subjectArray.push({subject:{ $regex: data, $options: 'si' } }),
+                standardArray.push({subject:{ $regex: data, $options: 'si' } })
             })
-            match.$or = [{ $and: firstNameArray }]
+            match.$or = [{ $and: firstNameArray }, { $and: lastNameArray }, { $and: phoneNumberArray }, { $and: userIdArray }, 
+                { $and: subjectArray }, { $and: standardArray }]
         }
 
         console.log(match);

@@ -20,6 +20,8 @@ const add_offline_fees = (req, res) => __awaiter(void 0, void 0, void 0, functio
     let { userId, feesDetails, totalAmount } = req.body, body = req.body, { user } = req.headers;
     console.log("Id => ", userId);
     try {
+        if (totalAmount <= 0)
+            return res.status(405).json(new common_1.apiResponse(405, "Invalid total amount", {}, {}));
         //step 0 check pendig fees first
         //step 1 transactionModel data add
         //step 2 usermodel pending fees update

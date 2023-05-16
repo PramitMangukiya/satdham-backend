@@ -64,18 +64,32 @@ exports.delete_enquiry_by_id = delete_enquiry_by_id;
 const get_all_enquiry = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     (0, helper_1.reqInfo)(req);
-    let response, { page, limit, search, userType } = req.body, match = {};
+    let response, { page, limit, search, userType, boardFilter, applyStandardFilter, lastYearPercentageFilter, subjectFilter, languageFilter, experienceFilter } = req.body, match = {};
     try {
         if (search) {
-            var enquiryArray = [];
+            var fatherNameArray = [], nameArray = [];
             search = search.split(" ");
             search.forEach(data => {
-                enquiryArray.push({ name: { $regex: data, $options: 'si' } });
+                // fullNameArray.push({$or:[{ name: { $regex: data, $options: 'si' } }, { fatherName: { $regex: data, $options: 'si' } }]})
+                nameArray.push({ name: { $regex: data, $options: 'si' } }),
+                    fatherNameArray.push({ fatherName: { $regex: data, $options: 'si' } });
             });
-            match.$or = [{ $and: enquiryArray }];
+            match.$or = [{ $and: nameArray }, { $and: fatherNameArray }];
         }
         if (userType || (userType == 0))
             match.type = userType;
+        if (boardFilter)
+            match.board = boardFilter;
+        if (applyStandardFilter)
+            match.applyStandard = applyStandardFilter;
+        if (lastYearPercentageFilter)
+            match.lastYearPercentage = lastYearPercentageFilter;
+        if (languageFilter)
+            match.lastYearPercentage = languageFilter;
+        if (experienceFilter)
+            match.experience = experienceFilter;
+        if (subjectFilter)
+            match.subject = subjectFilter;
         match.isActive = true;
         console.log("match", match);
         response = yield database_1.enquiryModel.aggregate([

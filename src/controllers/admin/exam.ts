@@ -3,6 +3,7 @@ import { apiResponse } from "../../common";
 import { examModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
 import { examStudentModel } from "../../database/models/exam_student";
+import { options } from "joi";
 
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -81,19 +82,21 @@ export const delete_exam_by_id = async(req,res) =>
 
 export const get_all_exam = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , examFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , examFilter,subjectFilter} = req.body, match: any = {};
     try {
         if (search){
-            var examArray: Array<any> = []
+            var examArray: Array<any> = [],standardArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
                 examArray.push({ name: { $regex: data, $options: 'si' } })
+                standardArray.push({name : {$regex: data, $options: 'si'}})
             })
-            match.$or = [{ $and: examArray }]
+            match.$or = [{ $and: examArray }, { $and: standardArray }]
         }
-        // if(examFilter) match.subjectId = ObjectId(examFilter);
+        // if(examFilter) match.subjectId = ObjectId(   );
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
+        if(subjectFilter) match.subject = subjectFilter;
         response = await examModel.aggregate([
             { $match: match },
             {

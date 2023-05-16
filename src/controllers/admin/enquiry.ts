@@ -57,17 +57,25 @@ export const delete_enquiry_by_id = async(req,res) =>
 
 export const get_all_enquiry = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , userType} = req.body, match: any = {};
+    let response: any, { page, limit, search , userType, boardFilter, applyStandardFilter,lastYearPercentageFilter, subjectFilter,languageFilter,experienceFilter} = req.body, match: any = {};
     try {
         if (search){
-            var enquiryArray: Array<any> = []
+            var  fatherNameArray:Array<any> = [], nameArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                enquiryArray.push({ name: { $regex: data, $options: 'si' } })
+                // fullNameArray.push({$or:[{ name: { $regex: data, $options: 'si' } }, { fatherName: { $regex: data, $options: 'si' } }]})
+                nameArray.push({ name: { $regex: data, $options: 'si' } }),
+                fatherNameArray.push({ fatherName: { $regex: data, $options: 'si'}})
             })
-            match.$or = [{ $and: enquiryArray }]
+            match.$or = [{ $and: nameArray },{ $and: fatherNameArray } ]
         }
         if(userType || (userType == 0)) match.type = userType;
+        if(boardFilter) match.board = boardFilter;
+        if(applyStandardFilter) match.applyStandard = applyStandardFilter;
+        if(lastYearPercentageFilter) match.lastYearPercentage = lastYearPercentageFilter;
+        if(languageFilter) match.lastYearPercentage = languageFilter;
+        if(experienceFilter) match.experience = experienceFilter;
+        if(subjectFilter) match.subject = subjectFilter;
         match.isActive = true
         console.log("match" , match);
         response = await enquiryModel.aggregate([

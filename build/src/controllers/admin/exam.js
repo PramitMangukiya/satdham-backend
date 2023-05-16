@@ -84,19 +84,22 @@ exports.delete_exam_by_id = delete_exam_by_id;
 const get_all_exam = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
     (0, helper_1.reqInfo)(req);
-    let response, { page, limit, search, examFilter } = req.body, match = {};
+    let response, { page, limit, search, examFilter, subjectFilter } = req.body, match = {};
     try {
         if (search) {
-            var examArray = [];
+            var examArray = [], standardArray = [];
             search = search.split(" ");
             search.forEach(data => {
                 examArray.push({ name: { $regex: data, $options: 'si' } });
+                standardArray.push({ name: { $regex: data, $options: 'si' } });
             });
-            match.$or = [{ $and: examArray }];
+            match.$or = [{ $and: examArray }, { $and: standardArray }];
         }
-        // if(examFilter) match.subjectId = ObjectId(examFilter);
+        // if(examFilter) match.subjectId = ObjectId(   );
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true;
+        if (subjectFilter)
+            match.subject = subjectFilter;
         response = yield database_1.examModel.aggregate([
             { $match: match },
             {

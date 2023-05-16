@@ -8,7 +8,7 @@ const enquirySchema: any = new mongoose.Schema({
     fatherName : { type : String},
     currStandard :  {type : Number},
     applyStandard : { type : Number},
-    board : {type : String}, 
+    board : {type : String},
     language :  {type : String},
 
     address : {type : String},

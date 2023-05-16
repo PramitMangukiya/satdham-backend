@@ -94,12 +94,34 @@ const get_all_groupHead = (req, res) => __awaiter(void 0, void 0, void 0, functi
                                 },
                             }
                         },
+                        {
+                            $lookup: {
+                                from: "standards",
+                                let: { standardId: '$standard' },
+                                pipeline: [
+                                    {
+                                        $match: {
+                                            $expr: {
+                                                $and: [
+                                                    { $eq: ['$_id', '$$standardId'] },
+                                                ],
+                                            },
+                                        }
+                                    },
+                                    { $project: { name: 1, number: 1 } }
+                                ],
+                                as: "standard"
+                            }
+                        },
+                        {
+                            $unwind: { path: "$standard", preserveNullAndEmptyArrays: true }
+                        },
                     ],
                     as: "user"
                 }
             },
             {
-                $unwind: "$user"
+                $unwind: { path: "$user", preserveNullAndEmptyArrays: true }
             },
             {
                 $facet: {
