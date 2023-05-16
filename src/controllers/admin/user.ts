@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { apiResponse, generatePassword, generateUserId, getMonthEndDate } from "../../common";
+import { apiResponse, generatePassword, generateUserId, getMonthEndDate, standardClass } from "../../common";
 import { attendanceModel, standardModel, userModel } from "../../database";
 import { reqInfo, responseMessage } from "../../helper";
+import { number } from "joi";
 
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -17,6 +18,7 @@ export const add_user = async (req: Request, res: Response) => {
         //if in one class same roll no is present then ?
         if((!body?.userType) || body.userType != "faculty")
         {
+            if(!standardClass.includes(body.class)) return res.status(405).json(new apiResponse(405, "Invalid class",{},{}))
             prefix = "U"; //setted prefix as a user
             const isExist = await userModel.findOne({isActive : true ,standard : ObjectId(body?.standard) , rollNo : body.rollNo ,class : body.class ,userType : "user" , })
             if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
@@ -72,6 +74,18 @@ export const edit_user_by_id = async(req,res) =>
     
                 console.log(isExist);
                 if(isExist) return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
+            }
+            if(body?.class) {
+                if(!standardClass.includes(body.class)) return res.status(405).json(new apiResponse(405, "Invalid class",{},{}))
+                let isExist = await userModel.findOne({isActive : true , 
+                                                          rollNo : data.rollNo ,
+                                                          class : body.class ,
+                                                          userType : "user" ,
+                                                           _id : {$ne : ObjectId(user?._id)} 
+                                                        },{new : true})
+    
+                console.log(isExist);
+                if(isExist) return res.status(404).json(new apiResponse(404 , `Student with same roll number existing in class${body.class}` , {} , {}));
             }
             console.log(body?.siblings , "siblings");
             if(body?.siblings?.length > 0)
@@ -431,12 +445,20 @@ export const add_student_in_bulk = async (req: Request, res: Response) => {
                     skippedData.push( { ...individual , reason :"Standard does not exist! please add standard first!"} );
                     continue;
                 }
+                //if standard is number then we have to fetch standard here from standard number
+                let hasValidClass =  standardClass.includes(individual.class)
+
+                if(!hasValidClass) {
+                    skippedDataCount ++ ;
+                    skippedData.push( { ...individual , reason :`Class does not exist! please add please add valid class, class can be: ${standardClass}!`} );
+                    continue;
+                }
 
                 prefix = "U"; //setted prefix as a user
                 const isExist = await userModel.findOne({isActive : true ,standard : ObjectId(standardData) , rollNo : individual.rollNo ,class : individual.class ,userType : "user"  })
                 if(isExist) {
                     skippedDataCount ++ ;
-                    skippedData.push( { ...individual , reason :"student with same roll no and class exist!"} );
+                    skippedData.push( { ...individual , reason :"Student with same roll no and class exist!"} );
                     continue;
                 }
                 // return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
@@ -448,6 +470,7 @@ export const add_student_in_bulk = async (req: Request, res: Response) => {
                 // individual.installments = standard?.installments
                 individual.totalFees = standardData?.fees || 0;
                 individual.pendingFees = standardData?.fees || 0;
+                individual.rollNo = Number(individual.rollNo)
     
                 while(!userId){
                     let temp = generateUserId(prefix);

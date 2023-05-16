@@ -23,6 +23,8 @@ const add_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         let userId = null, password;
         //if in one class same roll no is present then ?
         if ((!(body === null || body === void 0 ? void 0 : body.userType)) || body.userType != "faculty") {
+            if (!common_1.standardClass.includes(body.class))
+                return res.status(405).json(new common_1.apiResponse(405, "Invalid class", {}, {}));
             prefix = "U"; //setted prefix as a user
             const isExist = yield database_1.userModel.findOne({ isActive: true, standard: ObjectId(body === null || body === void 0 ? void 0 : body.standard), rollNo: body.rollNo, class: body.class, userType: "user", });
             if (isExist)
@@ -77,6 +79,19 @@ const edit_user_by_id = (req, res) => __awaiter(void 0, void 0, void 0, function
                 console.log(isExist);
                 if (isExist)
                     return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.dataAlreadyExist("Roll no"), {}, {}));
+            }
+            if (body === null || body === void 0 ? void 0 : body.class) {
+                if (!common_1.standardClass.includes(body.class))
+                    return res.status(405).json(new common_1.apiResponse(405, "Invalid class", {}, {}));
+                let isExist = yield database_1.userModel.findOne({ isActive: true,
+                    rollNo: data.rollNo,
+                    class: body.class,
+                    userType: "user",
+                    _id: { $ne: ObjectId(user === null || user === void 0 ? void 0 : user._id) }
+                }, { new: true });
+                console.log(isExist);
+                if (isExist)
+                    return res.status(404).json(new common_1.apiResponse(404, `Student with same roll number existing in class${body.class}`, {}, {}));
             }
             console.log(body === null || body === void 0 ? void 0 : body.siblings, "siblings");
             if (((_a = body === null || body === void 0 ? void 0 : body.siblings) === null || _a === void 0 ? void 0 : _a.length) > 0) {
@@ -407,11 +422,18 @@ const add_student_in_bulk = (req, res) => __awaiter(void 0, void 0, void 0, func
                 skippedData.push(Object.assign(Object.assign({}, individual), { reason: "Standard does not exist! please add standard first!" }));
                 continue;
             }
+            //if standard is number then we have to fetch standard here from standard number
+            let hasValidClass = common_1.standardClass.includes(individual.class);
+            if (!hasValidClass) {
+                skippedDataCount++;
+                skippedData.push(Object.assign(Object.assign({}, individual), { reason: `Class does not exist! please add please add valid class, class can be: ${common_1.standardClass}!` }));
+                continue;
+            }
             prefix = "U"; //setted prefix as a user
             const isExist = yield database_1.userModel.findOne({ isActive: true, standard: ObjectId(standardData), rollNo: individual.rollNo, class: individual.class, userType: "user" });
             if (isExist) {
                 skippedDataCount++;
-                skippedData.push(Object.assign(Object.assign({}, individual), { reason: "student with same roll no and class exist!" }));
+                skippedData.push(Object.assign(Object.assign({}, individual), { reason: "Student with same roll no and class exist!" }));
                 continue;
             }
             // return res.status(404).json(new apiResponse(404 , responseMessage?.dataAlreadyExist("Roll no") , {} , {}));
@@ -421,6 +443,7 @@ const add_student_in_bulk = (req, res) => __awaiter(void 0, void 0, void 0, func
             // individual.installments = standard?.installments
             individual.totalFees = (standardData === null || standardData === void 0 ? void 0 : standardData.fees) || 0;
             individual.pendingFees = (standardData === null || standardData === void 0 ? void 0 : standardData.fees) || 0;
+            individual.rollNo = Number(individual.rollNo);
             while (!userId) {
                 let temp = (0, common_1.generateUserId)(prefix);
                 const copy = yield database_1.userModel.findOne({ userId: temp, isActive: true, userType: "user" });
