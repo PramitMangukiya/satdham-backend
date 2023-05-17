@@ -79,17 +79,18 @@ const get_all_enquiry = (req, res) => __awaiter(void 0, void 0, void 0, function
         if (userType || (userType == 0))
             match.type = userType;
         if (boardFilter)
-            match.board = boardFilter;
+            match.board = { $regex: boardFilter, $options: 'si' };
+        ;
         if (applyStandardFilter)
-            match.applyStandard = applyStandardFilter;
+            match.applyStandard = { $regex: applyStandardFilter, $options: 'si' };
         if (lastYearPercentageFilter)
-            match.lastYearPercentage = lastYearPercentageFilter;
+            match.lastYearPercentage = { $regex: lastYearPercentageFilter, $options: 'si' };
         if (languageFilter)
-            match.lastYearPercentage = languageFilter;
+            match.language = { $regex: languageFilter, $options: 'si' };
         if (experienceFilter)
-            match.experience = experienceFilter;
+            match.experience = { $regex: experienceFilter, $options: 'si' };
         if (subjectFilter)
-            match.subject = subjectFilter;
+            match.subject = { $regex: subjectFilter, $options: 'si' };
         match.isActive = true;
         console.log("match", match);
         response = yield database_1.enquiryModel.aggregate([

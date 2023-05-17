@@ -136,7 +136,7 @@ export const delete_user_by_id = async(req,res) =>
 export const get_all_user = async (req, res) => {
     reqInfo(req)
     let response: any, { page, limit, search , userTypeFilter , pendingFeesFilter, classFilter,cityFilter, areaFilter, countryFilter, standardFilter,
-         stateFilter, districtFilter,zipCodeFilter} = req.body, match: any = {};
+         stateFilter, districtFilter,zipCodeFilter} = req.body, match: any = {}, matchAtLast:any={};
     try {
         if (search){
             var nameArray: Array<any>=[], lastNameArray: Array<any> = [], middleNameArray: Array<any> = [], userIdArray: Array<any> = [],
@@ -153,20 +153,28 @@ export const get_all_user = async (req, res) => {
             match.$or = [{ $and: nameArray },{ $and: lastNameArray }, {$and: middleNameArray}, { $and: phoneNumberArray }, 
                         {$and: standardArray}, {$and: classArray}, {$and : userIdArray}]
         }
-        if(userTypeFilter) match.userType = userTypeFilter;
-        if(pendingFeesFilter)match.pendingFees = {$gt : 0};
-        if(standardFilter) match.standard = { $regex: standardFilter, $options: 'si' };
-        if(classFilter)match.class = classFilter;
-        if(areaFilter) match.area = areaFilter
-        if(cityFilter) match.city = cityFilter
-        if(countryFilter) match.country = countryFilter
-        if(stateFilter) match.state = stateFilter
-        if(districtFilter) match.district = districtFilter
-        if(zipCodeFilter) match.zipCode = zipCodeFilter
 
-        console.log(match);
+    
+        
+        if(userTypeFilter) match.userType = { $regex: userTypeFilter, $options: 'si' };
+        if(pendingFeesFilter)match.pendingFees = {$gte : pendingFeesFilter.min, $lte: pendingFeesFilter.max};
+        if(standardFilter?.length > 0){
+            for (let i = 0; i < standardFilter.length; i++) {
+                const standardFi = standardFilter[i];
+                standardFilter[i] = ObjectId(standardFi);
+              }
+            match.standard = { $in: standardFilter }
+        } 
+        if(classFilter?.length > 0)match.class = { $in: classFilter };
+        if(areaFilter) match.area = { $regex: areaFilter, $options: 'si' }
+        if(cityFilter) match.city = { $regex: cityFilter, $options: 'si' }
+        if(countryFilter) match.country = { $regex: countryFilter, $options: 'si' }
+        if(districtFilter) match.district = { $regex: districtFilter, $options: 'si' }
+        if(stateFilter) match.state = { $regex: stateFilter, $options: 'si' }
+        if(zipCodeFilter) match.zipCode = { $regex: zipCodeFilter, $options: 'si' }
 
         // if(blockFilter) match.isBlock = blockFilter;
+        console.log("match ", match);
         match.isActive = true
         response = await userModel.aggregate([
             { $match: match },
@@ -196,6 +204,7 @@ export const get_all_user = async (req, res) => {
                     stdName: "$standard.name"  //added for frontend 
                 }
             },
+            { $match: matchAtLast },
             {
                 $facet: {
                     data: [
@@ -207,6 +216,7 @@ export const get_all_user = async (req, res) => {
                 }
             },
         ])
+        // console.log(standard);
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess('user'), {
             user_data: response[0].data,
             state: {
@@ -216,6 +226,7 @@ export const get_all_user = async (req, res) => {
             }
         }, {}))
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }
@@ -372,7 +383,7 @@ export const get_user_attendance = async(req,res)=>
 
 export const get_all_faculty = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search  } = req.body, match: any = {};
+    let response: any, { page, limit, search,subjectFilter  } = req.body, match: any = {};
     try {
         if (search){
             var firstNameArray: Array<any> = [] ,  lastNameArray: Array<any> = [] , phoneNumberArray: Array<any> = [], 
@@ -391,7 +402,7 @@ export const get_all_faculty = async (req, res) => {
         }
 
         console.log(match);
-
+        if(subjectFilter) match.subject = {$regex: subjectFilter, $options: 'si'};
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true
         match.userType  = "faculty"

@@ -21,7 +21,10 @@ exports.standardClass = [
     "C",
     "D",
     "E",
-    "F"
+    "F",
+    "G",
+    "H",
+    "I"
 ];
 exports.file_path = ['profile', 'document'];
 const generateUserId = (prefix) => {

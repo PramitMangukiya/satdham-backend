@@ -138,7 +138,7 @@ exports.delete_user_by_id = delete_user_by_id;
 const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
     (0, helper_1.reqInfo)(req);
-    let response, { page, limit, search, userTypeFilter, pendingFeesFilter, classFilter, cityFilter, areaFilter, countryFilter, standardFilter, stateFilter, districtFilter, zipCodeFilter } = req.body, match = {};
+    let response, { page, limit, search, userTypeFilter, pendingFeesFilter, classFilter, cityFilter, areaFilter, countryFilter, standardFilter, stateFilter, districtFilter, zipCodeFilter } = req.body, match = {}, matchAtLast = {};
     try {
         if (search) {
             var nameArray = [], lastNameArray = [], middleNameArray = [], userIdArray = [], phoneNumberArray = [], standardArray = [], classArray = [];
@@ -154,27 +154,32 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 { $and: standardArray }, { $and: classArray }, { $and: userIdArray }];
         }
         if (userTypeFilter)
-            match.userType = userTypeFilter;
+            match.userType = { $regex: userTypeFilter, $options: 'si' };
         if (pendingFeesFilter)
-            match.pendingFees = { $gt: 0 };
-        if (standardFilter)
-            match.standard = { $regex: standardFilter, $options: 'si' };
-        if (classFilter)
-            match.class = classFilter;
+            match.pendingFees = { $gte: pendingFeesFilter.min, $lte: pendingFeesFilter.max };
+        if ((standardFilter === null || standardFilter === void 0 ? void 0 : standardFilter.length) > 0) {
+            for (let i = 0; i < standardFilter.length; i++) {
+                const standardFi = standardFilter[i];
+                standardFilter[i] = ObjectId(standardFi);
+            }
+            match.standard = { $in: standardFilter };
+        }
+        if ((classFilter === null || classFilter === void 0 ? void 0 : classFilter.length) > 0)
+            match.class = { $in: classFilter };
         if (areaFilter)
-            match.area = areaFilter;
+            match.area = { $regex: areaFilter, $options: 'si' };
         if (cityFilter)
-            match.city = cityFilter;
+            match.city = { $regex: cityFilter, $options: 'si' };
         if (countryFilter)
-            match.country = countryFilter;
-        if (stateFilter)
-            match.state = stateFilter;
+            match.country = { $regex: countryFilter, $options: 'si' };
         if (districtFilter)
-            match.district = districtFilter;
+            match.district = { $regex: districtFilter, $options: 'si' };
+        if (stateFilter)
+            match.state = { $regex: stateFilter, $options: 'si' };
         if (zipCodeFilter)
-            match.zipCode = zipCodeFilter;
-        console.log(match);
+            match.zipCode = { $regex: zipCodeFilter, $options: 'si' };
         // if(blockFilter) match.isBlock = blockFilter;
+        console.log("match ", match);
         match.isActive = true;
         response = yield database_1.userModel.aggregate([
             { $match: match },
@@ -204,6 +209,7 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     stdName: "$standard.name" //added for frontend 
                 }
             },
+            { $match: matchAtLast },
             {
                 $facet: {
                     data: [
@@ -215,6 +221,7 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                 }
             },
         ]);
+        // console.log(standard);
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess('user'), {
             user_data: response[0].data,
             state: {
@@ -225,6 +232,7 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         }, {}));
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
     }
 });
@@ -359,7 +367,7 @@ exports.get_user_attendance = get_user_attendance;
 const get_all_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _d, _e;
     (0, helper_1.reqInfo)(req);
-    let response, { page, limit, search } = req.body, match = {};
+    let response, { page, limit, search, subjectFilter } = req.body, match = {};
     try {
         if (search) {
             var firstNameArray = [], lastNameArray = [], phoneNumberArray = [], subjectArray = [], userIdArray = [], standardArray = [];
@@ -376,6 +384,8 @@ const get_all_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function
                 { $and: subjectArray }, { $and: standardArray }];
         }
         console.log(match);
+        if (subjectFilter)
+            match.subject = { $regex: subjectFilter, $options: 'si' };
         // if(blockFilter) match.isBlock = blockFilter;
         match.isActive = true;
         match.userType = "faculty";

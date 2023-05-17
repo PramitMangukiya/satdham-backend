@@ -24,7 +24,10 @@ export const standardClass = [
   "C",
   "D",
   "E",
-  "F"
+  "F",
+  "G",
+  "H",
+  "I"
 ]
 
 export const file_path = ['profile', 'document']
