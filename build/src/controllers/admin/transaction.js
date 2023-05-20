@@ -67,7 +67,7 @@ exports.add_offline_fees = add_offline_fees;
 const get_all_transactions = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b;
     (0, helper_1.reqInfo)(req);
-    let response, { search, pendingFeesFilter, page, limit } = req.body, match = {};
+    let response, { search, classFilter, page, limit, standardFilter } = req.body, match = {}, matchAtLast = {};
     try {
         if (search) {
             var firstNameArray = [], lastNameArray = [], middleNameArray = [], rollNumberArray = [], stdArray = [], classArray = [];
@@ -78,13 +78,21 @@ const get_all_transactions = (req, res) => __awaiter(void 0, void 0, void 0, fun
                 middleNameArray.push({ "user.middleName": { $regex: data, $options: 'si' } });
                 rollNumberArray.push({ "user.rollNo": { $regex: data, $options: 'si' } });
             });
-            match.$or = [{ $and: firstNameArray }];
+            matchAtLast.$or = [{ $and: firstNameArray }, { $and: lastNameArray }, { $and: middleNameArray }, { $and: firstNameArray }, { $and: rollNumberArray },];
         }
-        if (pendingFeesFilter)
-            match.pendingFees = { $gt: 0 };
+        if ((standardFilter === null || standardFilter === void 0 ? void 0 : standardFilter.length) > 0) {
+            // for (let i = 0; i < standardFilter.length; i++) {
+            //     const standardFi = standardFilter[i];
+            //     standardFilter[i] = ObjectId(standardFi);
+            //   }
+            matchAtLast["standard.name"] = { $in: standardFilter };
+        }
+        if ((classFilter === null || classFilter === void 0 ? void 0 : classFilter.length) > 0)
+            match.class = { $in: classFilter };
         match.isActive = true;
-        console.log(match);
+        console.log("match ", match, "match2", matchAtLast);
         response = yield transaction_1.transactionModel.aggregate([
+            { $match: match },
             {
                 $lookup: {
                     from: "users",
@@ -137,7 +145,7 @@ const get_all_transactions = (req, res) => __awaiter(void 0, void 0, void 0, fun
                     preserveNullAndEmptyArrays: true
                 }
             },
-            { $match: match },
+            { $match: matchAtLast },
             {
                 $facet: {
                     data: [

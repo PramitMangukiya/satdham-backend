@@ -116,6 +116,7 @@ const get_all_enquiry = (req, res) => __awaiter(void 0, void 0, void 0, function
         }, {}));
     }
     catch (error) {
+        console.log(error);
         return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
     }
 });

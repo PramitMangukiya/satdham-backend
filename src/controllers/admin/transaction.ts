@@ -66,7 +66,7 @@ export const add_offline_fees = async (req: Request, res: Response) => {
 
 export const get_all_transactions =async (req, res) => {
   reqInfo(req)
-  let response :any ,{search, pendingFeesFilter,page,limit} = req.body,match : any = {}
+  let response :any ,{search,classFilter,page,limit,standardFilter} = req.body,match : any = {},matchAtLast : any = {}
  try{
 
   if(search){
@@ -79,13 +79,22 @@ export const get_all_transactions =async (req, res) => {
       middleNameArray.push({ "user.middleName": { $regex: data, $options: 'si' } })
       rollNumberArray.push({ "user.rollNo": { $regex: data, $options: 'si' } })
     })
-    match.$or = [{ $and: firstNameArray }]
+    matchAtLast.$or = [{ $and: firstNameArray },{ $and: lastNameArray },{ $and: middleNameArray },{ $and: firstNameArray },{ $and: rollNumberArray },]
   }
   
-  if(pendingFeesFilter)match.pendingFees = {$gt : 0};
+  if(standardFilter?.length > 0){
+    // for (let i = 0; i < standardFilter.length; i++) {
+    //     const standardFi = standardFilter[i];
+    //     standardFilter[i] = ObjectId(standardFi);
+    //   }
+    matchAtLast["standard.name"] = { $in: standardFilter }
+} 
+if(classFilter?.length > 0)match.class = { $in: classFilter };
+
   match.isActive = true
-  console.log(match);
-   response = await transactionModel.aggregate([
+  console.log("match ", match , "match2" , matchAtLast);
+  response = await transactionModel.aggregate([
+    { $match: match },
       {
         $lookup: {
             from: "users",
@@ -138,7 +147,9 @@ export const get_all_transactions =async (req, res) => {
         preserveNullAndEmptyArrays: true
       }
     },
-    { $match: match },
+
+    { $match: matchAtLast },
+
   {
       $facet: {
           data: [
