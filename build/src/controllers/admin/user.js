@@ -140,7 +140,6 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     (0, helper_1.reqInfo)(req);
     let response, { page, limit, search, userTypeFilter, pendingFeesFilter, classFilter, cityFilter, areaFilter, countryFilter, standardFilter, stateFilter, districtFilter, zipCodeFilter } = req.body, match = {}, matchAtLast = {};
     try {
-        console.log(page, "==", limit, "pagelimit");
         if (search) {
             var nameArray = [], lastNameArray = [], middleNameArray = [], userIdArray = [], phoneNumberArray = [];
             // standardArray: Array<any> = [], classArray: Array<any> = []
