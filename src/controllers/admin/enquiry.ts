@@ -71,8 +71,8 @@ export const get_all_enquiry = async (req, res) => {
         }
         if(userType || (userType == 0)) match.type = userType;
         if(boardFilter) match.board = {$regex: boardFilter, $options: 'si'};;
-        if(applyStandardFilter) match.applyStandard = {$regex: applyStandardFilter, $options: 'si'};
-        if(lastYearPercentageFilter) match.lastYearPercentage = {$regex: lastYearPercentageFilter, $options: 'si'};
+        if(applyStandardFilter) match.applyStandard = applyStandardFilter;
+        if(lastYearPercentageFilter) match.lastYearPercentage = lastYearPercentageFilter;
         if(languageFilter) match.language = {$regex: languageFilter, $options: 'si'};
         if(experienceFilter) match.experience = {$regex: experienceFilter, $options: 'si'};
         if(subjectFilter) match.subject = {$regex: subjectFilter, $options: 'si'};
@@ -100,6 +100,7 @@ export const get_all_enquiry = async (req, res) => {
             }
         }, {}))
     } catch (error) {
+        console.log(error);
         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}, error))
     }
 }

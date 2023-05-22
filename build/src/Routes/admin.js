@@ -23,6 +23,7 @@ router.get("/user/:id", controllers_1.adminController.get_by_id_user);
 router.post("/user/attendance", controllers_1.adminController.get_user_attendance);
 router.post("/faculty/get/all", controllers_1.adminController.get_all_faculty);
 router.post("/user/bulk/add", controllers_1.adminController.add_student_in_bulk);
+router.post("/get/dashboard", controllers_1.adminController.get_dashboard_data);
 //------------------------ Enquiry -----------------------------------------
 router.post("/enquiry/add", controllers_1.adminController.add_enquiry);
 router.post("/enquiry/edit", controllers_1.adminController.edit_enquiry_by_id);

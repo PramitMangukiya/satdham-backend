@@ -7,4 +7,4 @@ const orderSchema: any = new mongoose.Schema({
     isActive : {type : Boolean , default : true}
 }, { timestamps: true })
 
-export const orderModel = mongoose.model('order', orderSchema);
+export const    orderModel = mongoose.model('order', orderSchema);
