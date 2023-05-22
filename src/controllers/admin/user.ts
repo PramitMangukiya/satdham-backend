@@ -69,7 +69,7 @@ export const edit_user_by_id = async(req,res) =>
                                                           rollNo : body.rollNo ,
                                                           class : data.class ,
                                                           userType : "user" ,
-                                                           _id : {$ne : ObjectId(user?._id)} 
+                                                           _id : {$ne : ObjectId(data._id)} 
                                                         },{new : true})
     
                 console.log(isExist);
@@ -81,7 +81,7 @@ export const edit_user_by_id = async(req,res) =>
                                                           rollNo : data.rollNo ,
                                                           class : body.class ,
                                                           userType : "user" ,
-                                                           _id : {$ne : ObjectId(user?._id)} 
+                                                           _id : {$ne : ObjectId(data._id)} 
                                                         },{new : true})
     
                 console.log(isExist);
@@ -140,7 +140,8 @@ export const get_all_user = async (req, res) => {
     try {
         if (search){
             var nameArray: Array<any>=[], lastNameArray: Array<any> = [], middleNameArray: Array<any> = [], userIdArray: Array<any> = [],
-            phoneNumberArray: Array<any> = [], standardArray: Array<any> = [], classArray: Array<any> = []
+            phoneNumberArray: Array<any> = [];
+            // standardArray: Array<any> = [], classArray: Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
                 nameArray.push({firstName: {$regex: data, $options:'si'}}),
@@ -151,19 +152,17 @@ export const get_all_user = async (req, res) => {
             })
             
             match.$or = [{ $and: nameArray },{ $and: lastNameArray }, {$and: middleNameArray}, { $and: phoneNumberArray }, 
-                        {$and: standardArray}, {$and: classArray}, {$and : userIdArray}]
+                         {$and : userIdArray}]
         }
 
-    
-        
         if(userTypeFilter) match.userType = { $regex: userTypeFilter, $options: 'si' };
         if(pendingFeesFilter)match.pendingFees = {$gte : pendingFeesFilter.min, $lte: pendingFeesFilter.max};
         if(standardFilter?.length > 0){
-            for (let i = 0; i < standardFilter.length; i++) {
-                const standardFi = standardFilter[i];
-                standardFilter[i] = ObjectId(standardFi);
-              }
-            match.standard = { $in: standardFilter }
+            // for (let i = 0; i < standardFilter.length; i++) {
+            //     const standardFi = standardFilter[i];
+            //     standardFilter[i] = ObjectId(standardFi);
+            //   }
+            matchAtLast["standard.name"] = { $in: standardFilter }
         } 
         if(classFilter?.length > 0)match.class = { $in: classFilter };
         if(areaFilter) match.area = { $regex: areaFilter, $options: 'si' }
@@ -174,7 +173,7 @@ export const get_all_user = async (req, res) => {
         if(zipCodeFilter) match.zipCode = { $regex: zipCodeFilter, $options: 'si' }
 
         // if(blockFilter) match.isBlock = blockFilter;
-        console.log("match ", match);
+        console.log("match ", match , "match2" , matchAtLast);
         match.isActive = true
         response = await userModel.aggregate([
             { $match: match },

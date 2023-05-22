@@ -74,7 +74,7 @@ const edit_user_by_id = (req, res) => __awaiter(void 0, void 0, void 0, function
                     rollNo: body.rollNo,
                     class: data.class,
                     userType: "user",
-                    _id: { $ne: ObjectId(user === null || user === void 0 ? void 0 : user._id) }
+                    _id: { $ne: ObjectId(data._id) }
                 }, { new: true });
                 console.log(isExist);
                 if (isExist)
@@ -87,7 +87,7 @@ const edit_user_by_id = (req, res) => __awaiter(void 0, void 0, void 0, function
                     rollNo: data.rollNo,
                     class: body.class,
                     userType: "user",
-                    _id: { $ne: ObjectId(user === null || user === void 0 ? void 0 : user._id) }
+                    _id: { $ne: ObjectId(data._id) }
                 }, { new: true });
                 console.log(isExist);
                 if (isExist)
@@ -141,7 +141,8 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     let response, { page, limit, search, userTypeFilter, pendingFeesFilter, classFilter, cityFilter, areaFilter, countryFilter, standardFilter, stateFilter, districtFilter, zipCodeFilter } = req.body, match = {}, matchAtLast = {};
     try {
         if (search) {
-            var nameArray = [], lastNameArray = [], middleNameArray = [], userIdArray = [], phoneNumberArray = [], standardArray = [], classArray = [];
+            var nameArray = [], lastNameArray = [], middleNameArray = [], userIdArray = [], phoneNumberArray = [];
+            // standardArray: Array<any> = [], classArray: Array<any> = []
             search = search.split(" ");
             search.forEach(data => {
                 nameArray.push({ firstName: { $regex: data, $options: 'si' } }),
@@ -151,18 +152,18 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
                     userIdArray.push({ userId: { $regex: data, $options: 'si' } });
             });
             match.$or = [{ $and: nameArray }, { $and: lastNameArray }, { $and: middleNameArray }, { $and: phoneNumberArray },
-                { $and: standardArray }, { $and: classArray }, { $and: userIdArray }];
+                { $and: userIdArray }];
         }
         if (userTypeFilter)
             match.userType = { $regex: userTypeFilter, $options: 'si' };
         if (pendingFeesFilter)
             match.pendingFees = { $gte: pendingFeesFilter.min, $lte: pendingFeesFilter.max };
         if ((standardFilter === null || standardFilter === void 0 ? void 0 : standardFilter.length) > 0) {
-            for (let i = 0; i < standardFilter.length; i++) {
-                const standardFi = standardFilter[i];
-                standardFilter[i] = ObjectId(standardFi);
-            }
-            match.standard = { $in: standardFilter };
+            // for (let i = 0; i < standardFilter.length; i++) {
+            //     const standardFi = standardFilter[i];
+            //     standardFilter[i] = ObjectId(standardFi);
+            //   }
+            matchAtLast["standard.name"] = { $in: standardFilter };
         }
         if ((classFilter === null || classFilter === void 0 ? void 0 : classFilter.length) > 0)
             match.class = { $in: classFilter };
@@ -179,7 +180,7 @@ const get_all_user = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         if (zipCodeFilter)
             match.zipCode = { $regex: zipCodeFilter, $options: 'si' };
         // if(blockFilter) match.isBlock = blockFilter;
-        console.log("match ", match);
+        console.log("match ", match, "match2", matchAtLast);
         match.isActive = true;
         response = yield database_1.userModel.aggregate([
             { $match: match },
