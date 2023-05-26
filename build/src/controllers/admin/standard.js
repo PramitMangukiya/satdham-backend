@@ -85,7 +85,7 @@ const get_all_standard = (req, res) => __awaiter(void 0, void 0, void 0, functio
             {
                 $facet: {
                     data: [
-                        { $sort: { createdAt: -1 } },
+                        { $sort: { number: 1 } },
                         { $skip: (page - 1) * limit },
                         { $limit: limit },
                     ],

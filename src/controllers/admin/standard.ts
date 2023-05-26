@@ -75,7 +75,7 @@ export const get_all_standard = async (req, res) => {
             {
                 $facet: {
                     data: [
-                        { $sort: { createdAt: -1 } },
+                        { $sort: { number: 1 } },
                         { $skip: (((page as number - 1) * limit as number)) },
                         { $limit: limit as number },
                     ],

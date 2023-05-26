@@ -19,7 +19,7 @@ export const get_dashboard_data = async(req, res)=> {
                     {$match: match},
                     {
                         $group:{    
-                            _id: null,              
+                            _id: null,     
                             totalPendingFees: { $sum: '$pendingFees' },
                             totalFees: { $sum: '$totalFees' },
                             totalSalary : {$sum:"$salary"}

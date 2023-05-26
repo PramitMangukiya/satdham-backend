@@ -57,15 +57,16 @@ export const delete_groupHead_by_id = async(req,res) =>
 
 export const get_all_groupHead = async (req, res) => {
     reqInfo(req)
-    let response: any, { page, limit, search , groupHeadFilter} = req.body, match: any = {};
+    let response: any, { page, limit, search , groupHeadFilter} = req.body, match: any = {}, matchAtLast : any = {};
     try {
         if (search){
-            var groupHeadArray: Array<any> = []
+            var groupHeadArray: Array<any> = [], firstNameArray:Array<any> = []
             search = search.split(" ")
             search.forEach(data => {
-                groupHeadArray.push({ name: { $regex: data, $options: 'si' } })
+                groupHeadArray.push({ type: { $regex: data, $options: 'si' } })
+                firstNameArray.push({ "user.firstName": { $regex: data, $options: 'si' } })            
             })
-            match.$or = [{ $and: groupHeadArray }]
+            matchAtLast.$or = [{ $and: groupHeadArray }, { $and: firstNameArray }]
         }
         // if(groupHeadFilter) match.subjectId = ObjectId(groupHeadFilter);
         // if(blockFilter) match.isBlock = blockFilter;
@@ -116,6 +117,7 @@ export const get_all_groupHead = async (req, res) => {
                 $unwind : {path:"$user", preserveNullAndEmptyArrays: true}
                     
             },
+            {$match: matchAtLast},
             {
                 $facet: {
                     data: [
