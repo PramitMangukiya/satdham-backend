@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.edit_faculty = void 0;
+exports.get_faculty = exports.edit_faculty = void 0;
 const database_1 = require("../../database");
 const helper_1 = require("../../helper");
 const common_1 = require("../../common");
@@ -18,7 +18,7 @@ const edit_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     (0, helper_1.reqInfo)(req);
     let body = req.body, { _id, attendance } = req.body, { user } = req.headers;
     try {
-        const response = yield database_1.userModel.findOneAndUpdate({ _id: ObjectId(body._id), userType: "faculty", isActive: true }, body, { new: true });
+        const response = yield database_1.userModel.findOneAndUpdate({ _id: ObjectId(user._id), isActive: true }, body, { new: true });
         if (!response)
             return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.updateDataError("faculty"), {}, {}));
         return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage.updateDataSuccess("faculty"), response, {}));
@@ -29,4 +29,19 @@ const edit_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.edit_faculty = edit_faculty;
+const get_faculty = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    (0, helper_1.reqInfo)(req);
+    let { user } = req.headers;
+    try {
+        const response = yield database_1.userModel.findOne({ _id: ObjectId(user._id), isActive: true, userType: "faculty" });
+        if (!response)
+            return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataNotFound("faculty"), {}, {}));
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess("faculty"), response, {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.internalServerError, {}, error));
+    }
+});
+exports.get_faculty = get_faculty;
 //# sourceMappingURL=faculty.js.map
