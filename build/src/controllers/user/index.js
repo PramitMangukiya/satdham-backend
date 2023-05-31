@@ -19,4 +19,5 @@ __exportStar(require("./achievement"), exports);
 __exportStar(require("./attendance"), exports);
 __exportStar(require("./transportation"), exports);
 __exportStar(require("./fees_details"), exports);
+__exportStar(require("./exam"), exports);
 //# sourceMappingURL=index.js.map

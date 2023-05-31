@@ -31,4 +31,7 @@ router.post("/paytm", userController.paytm)
 router.post("/paytm/callback", userController.paytm_callback)
 router.get("/paytm/txnstatus", userController.paytm_txnStatus)
 
+//----------------------- Exam ------------------------------
+router.get("/exam/:id", userController.get_by_id_exam)
+
 export const userRouter = router

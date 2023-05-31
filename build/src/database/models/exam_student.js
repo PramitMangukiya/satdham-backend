@@ -16,6 +16,7 @@ const examStudentSchema = new mongoose.Schema({
             practicalMarks: { type: Number, default: null },
             theoryMarks: { type: Number, default: null }
         }],
+    isExamMarks: { type: Boolean, default: false }
 }, { timestamps: true });
 exports.examStudentModel = mongoose.model('exam_student', examStudentSchema);
 //# sourceMappingURL=exam_student.js.map

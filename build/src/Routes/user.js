@@ -19,5 +19,7 @@ router.get("/fees/history/:id", controllers_1.userController.get_payment_history
 router.post("/paytm", controllers_1.userController.paytm);
 router.post("/paytm/callback", controllers_1.userController.paytm_callback);
 router.get("/paytm/txnstatus", controllers_1.userController.paytm_txnStatus);
+//----------------------- Exam ------------------------------
+router.get("/exam/:id", controllers_1.userController.get_by_id_exam);
 exports.userRouter = router;
 //# sourceMappingURL=user.js.map

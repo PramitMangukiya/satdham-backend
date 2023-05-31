@@ -14,7 +14,7 @@ const examStudentSchema: any = new mongoose.Schema({
         practicalMarks : { type : Number , default : null},
         theoryMarks : {type: Number , default : null}
     }],
-   
+   isExamMarks: {type: Boolean, default: false}
 }, { timestamps: true })
 
 export const examStudentModel = mongoose.model('exam_student', examStudentSchema);

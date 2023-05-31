@@ -174,6 +174,7 @@ const edit_or_add_exam_marks_of_student = (req, res) => __awaiter(void 0, void 0
     (0, helper_1.reqInfo)(req);
     let { exam } = req.headers, body = req.body, { examStudentId } = req.body;
     try {
+        body.isExamMarks = true;
         const response = yield exam_student_1.examStudentModel.findOneAndUpdate({ _id: ObjectId(examStudentId) }, body, { new: true });
         if (!response)
             return res.status(404).json(new common_1.apiResponse(404, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.updateDataError("exam"), {}, {}));

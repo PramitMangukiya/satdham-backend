@@ -23,7 +23,7 @@ export const add_exam = async (req: Request, res: Response) => {
         console.log(exam._doc , "examData");
         //step2
         const students = await userModel.find({userType : "user" , isActive : true, standard : ObjectId(exam?.standard)});
-
+        
         //copying timetable into marks
         let marks = [...(exam._doc?.timetable)];
 
@@ -175,6 +175,7 @@ export const edit_or_add_exam_marks_of_student = async(req,res) =>
         body = req.body,
         {examStudentId} = req.body;
     try {
+        body.isExamMarks = true;
         const response = await examStudentModel.findOneAndUpdate({ _id: ObjectId(examStudentId) }, body , {new : true})
         if(!response) return res.status(404).json(new apiResponse(404 , responseMessage?.updateDataError("exam") , {} , {}));
 
