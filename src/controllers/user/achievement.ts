@@ -15,6 +15,7 @@ export const get_by_id_achievement = async (req: Request, res: Response) => {
       const achievements = user.achievements;
       const startIndex = (page - 1) * limit;
       
+      
       const paginatedAchievements = await userModel
         .find({ _id: ObjectId(id), isActive: true })
         .select('achievements')
