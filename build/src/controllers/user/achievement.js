@@ -15,33 +15,26 @@ const helper_1 = require("../../helper");
 const common_1 = require("../../common");
 const ObjectId = require("mongoose").Types.ObjectId;
 const get_by_id_achievement = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
     (0, helper_1.reqInfo)(req);
-    let response, { id } = req.params, { page, limit } = req.body;
+    let { id } = req.params, { page, limit } = req.body;
     try {
         const user = yield database_1.userModel.findOne({ _id: ObjectId(id), isActive: true }, {});
         if (!user)
             return res.status(400).json(new common_1.apiResponse(400, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataNotFound("user"), {}, {}));
         const achievements = user.achievements;
-        response = yield database_1.userModel.aggregate([
-            {
-                $facet: {
-                    data: [
-                        { $sort: { createdAt: -1 } },
-                        { $skip: (page - 1) * limit },
-                        { $limit: limit },
-                    ],
-                    data_count: [{ $count: "count" }]
-                }
+        const startIndex = (page - 1) * limit;
+        const paginatedAchievements = yield database_1.userModel
+            .find({ _id: ObjectId(id), isActive: true })
+            .select('achievements')
+            .slice('achievements', [startIndex, startIndex + limit])
+            .sort({ createdAt: -1 });
+        const Count = achievements.length;
+        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess("achievement"), {
+            achievements: paginatedAchievements[0].achievements, state: {
+                page,
+                limit,
+                page_limit: Math.ceil(Count / limit) || 1
             },
-        ]);
-        return res.status(200).json(new common_1.apiResponse(200, helper_1.responseMessage === null || helper_1.responseMessage === void 0 ? void 0 : helper_1.responseMessage.getDataSuccess('achivement'), {
-            achievements,
-            state: {
-                page: page,
-                limit: limit,
-                page_limit: Math.ceil(((_a = response[0].data_count[0]) === null || _a === void 0 ? void 0 : _a.count) / ((_b = req.body) === null || _b === void 0 ? void 0 : _b.limit)) || 1,
-            }
         }, {}));
     }
     catch (error) {
